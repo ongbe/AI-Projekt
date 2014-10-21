@@ -99,6 +99,53 @@ public:
         }
     }
 
+	/** Adds a small number to A,B,q */
+	void add()
+    {
+        double extra = 1./N;
+        //A
+        for(int i=0;i<N;++i)
+        {
+            double sum = 0;
+            for(int j=0;j<N;++j)
+            {
+                A[i][j] += extra;
+                sum += A[i][j];
+            }
+            for(int j=0;j<N;++j)
+            {
+                A[i][j] = A[i][j]/sum;
+            }
+        }
+
+        //B
+        for(int i=0;i<M;++i)
+        {
+            double sum = 0;
+            for(int j=0;j<N;++j)
+            {
+                B[i][j] += extra;
+                sum += B[i][j];
+            }
+            for(int j=0;j<N;++j)
+            {
+                B[i][j] = B[i][j]/sum;
+            }
+        }
+
+        //q
+        double sum = 0;
+        for(int j=0;j<N;++j)
+        {
+            q[j] += extra;
+            sum += q[j];
+        }
+        for(int j=0;j<N;++j)
+        {
+            q[j] = q[j]/sum;
+        }
+    }
+
 	/**viterbi*/
     std::vector<int> Viterbi(std::vector<int> seq)
     {
@@ -335,11 +382,17 @@ public:
         for(int i=0;i<N && !batman;++i)
             for(int j=0;j<N && !batman;++j)
                 if(std::isnan(A[i][j]))
-                   batman = true;
+                {
+                    batman = true;
+                    A[i][j] = 0;
+                }
         for(int i=0;i<N && !batman;++i)
             for(int j=0;j<M && !batman;++j)
                 if(std::isnan(B[i][j]))
-                   batman = true;
+                {
+                    batman = true;
+                    B[i][j] = 0;
+                }
         if(batman)
             std::cerr << "NaN" << std::endl;
 
@@ -347,7 +400,7 @@ public:
         if((itter == MaxItter) || (batman))
             converged = false;
 
-        //std::cerr << "Itterations " << itter << std::endl;
+        std::cerr << "Itterations " << itter << std::endl;
     }
 
     bool isConverged()
