@@ -10,7 +10,14 @@ struct word
 {
     std::string it;
     int index;
-    bool word::operator= (const word &one)
+
+    bool operator==(word &other)
+	{
+	    if (it==other.it)
+            return true;
+        return false;
+	}
+
 };
 
 /*hashfunktion*/
