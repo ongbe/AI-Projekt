@@ -4,9 +4,16 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <unordered_set>
 
+struct word
+{
+    std::string words;
+    int index;
 
-std::vector<std::string> words;
+};
+
+std::unordered_set<std::string> words;
 std::vector<int> index;
 std::vector< std::vector<int> > sequences;
 int maxIndex = -1;
@@ -18,22 +25,16 @@ std::string getWord(int i);
 
 bool inVector(std::string in)
 {
-    for(int i=0;i<(int)words.size();++i)
-    {
-        if(words[i] == in)
-            return true;
-    }
-    return false;
+    if(words.find(in) != words.end())
+        return true;
+    else return false;
 }
 
 int indexInVector(std::string in)
 {
-    for(int i=0;i<(int)words.size();++i)
-    {
-        if(words[i] == in)
-            return i;
-    }
-    return -1;
+    std::unordered_set<std::string>::const_iterator i = words.find(in);
+    if (i != words.end()) return 0;
+    else return -1;
 }
 
 std::string getWord(int i)
@@ -71,7 +72,7 @@ int main()
                 if(!inVector(temp))
                 {
                     maxIndex++;
-                    words.push_back(temp);
+                    words.insert(temp);
                     index.push_back(maxIndex);
                     sequence.push_back(maxIndex);
                 }
