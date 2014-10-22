@@ -49,9 +49,13 @@ std::string getWord(int i)
 int main()
 {
     std::string line;
-    std::ifstream myfile ("poems.txt");
+    //std::ifstream myfile ("poems.txt");
+    std::ifstream myfile("ShakespeareSonnets.txt");
     if (myfile.is_open())
     {
+        /* Skip copyright notices etcetera */
+        for(int i = 0; i < 288; ++i) getline(myfile,line);
+        /* Actual used code*/
         while ( getline (myfile,line) )
         {
             //std::cout << line << std::endl;
@@ -81,7 +85,7 @@ int main()
         myfile.close();
     }
     else std::cout << "Unable to open file";
-
+    std::cout << "Reading done" << std::endl;
     HMM model(maxIndex+1,maxIndex+1);
     model.reset();
 
