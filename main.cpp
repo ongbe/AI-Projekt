@@ -8,10 +8,21 @@
 
 struct word
 {
-    std::string words;
+    std::string it;
     int index;
-
+    bool word::operator= (const word &one)
 };
+
+/*hashfunktion*/
+namespace std
+{
+template<>
+struct hash<word> {
+    size_t operator()(const word &pt) const {
+        return std::hash<std::string>()(pt.it);
+    }
+};
+}
 
 std::unordered_set<std::string> words;
 std::vector<int> index;
