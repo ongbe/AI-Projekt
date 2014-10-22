@@ -6,32 +6,8 @@
 #include <sstream>
 #include <unordered_set>
 
-struct word
-{
-    std::string it;
-    int index;
-
-    bool operator==(word &other)
-	{
-	    if (it==other.it)
-            return true;
-        return false;
-	}
-
-};
-
-/*hashfunktion*/
-namespace std
-{
-template<>
-struct hash<word> {
-    size_t operator()(const word &pt) const {
-        return std::hash<std::string>()(pt.it);
-    }
-};
-}
-
-std::unordered_set<std::string> words;
+std::unordered_set<std::string> wordset;
+std::vector<std::string> words;
 std::vector<int> index;
 std::vector< std::vector<int> > sequences;
 int maxIndex = -1;
@@ -43,15 +19,14 @@ std::string getWord(int i);
 
 bool inVector(std::string in)
 {
-    if(words.find(in) != words.end())
-        return true;
+    if(wordset.find(in) != wordset.end()) return true;
     else return false;
 }
 
 int indexInVector(std::string in)
 {
-    std::unordered_set<std::string>::const_iterator i = words.find(in);
-    if (i != words.end()) return 0;
+    std::unordered_set<std::string>::const_iterator i = wordset.find(in);
+    if (i != wordset.end()) return 0;
     else return -1;
 }
 
@@ -90,7 +65,8 @@ int main()
                 if(!inVector(temp))
                 {
                     maxIndex++;
-                    words.insert(temp);
+                    wordset.insert(temp);
+                    words.push_back(temp);
                     index.push_back(maxIndex);
                     sequence.push_back(maxIndex);
                 }

@@ -222,7 +222,7 @@ public:
         //std::cerr << "BAUM" << std::endl;
         int T = (int)seq.size();
 
-        int MaxItter = 200;
+        int MaxItter = 20;
         int itter = 0;
         double OldLogProb = -std::numeric_limits<double>::max();
 
