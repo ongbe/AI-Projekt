@@ -84,16 +84,23 @@ int main()
     HMM model(maxIndex+1,maxIndex+1);
     model.reset();
 
+    std::cerr << "max i: " << sequences.size() << std::endl;
+
     for(int i=0;i<(int)sequences.size();++i)
     {
+        std::cerr << "for-loop, i=" << i << std::endl;
         std::vector<int> temp = sequences[i];
 
-        for(int i=0;i<(int)temp.size();++i)
-            std::cerr << temp[i] << " ";
-        std::cerr << std::endl;
+        std::cerr << "sequence.size(): "<< temp.size() << "  " << std::endl;
 
+        for(int i=0;i<(int)temp.size();++i)
+            std::cerr << temp[i] << " ";      // <------------Här skrivs 0:an ut, Det är för att den första sekvensen har längden 1 och endast
+        std::cerr << std::endl;               //              innehåller en 0:a.
+
+        std::cerr << "Baum-Welch" << std::endl;
         model.BaumWelch(temp);
         model.add();
+        std::cerr << "Baum-Welch + add done" << std::endl;
 
         std::vector<int> ny = model.Viterbi(temp);
 
