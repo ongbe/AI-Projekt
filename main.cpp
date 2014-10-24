@@ -8,34 +8,22 @@
 #include <cmath>
 
 //std::unordered_set<std::string> wordset;
-std::unordered_map<std::string,int> wordmap;
-std::vector<std::string> words;
-std::vector<int> index;
+std::unordered_map<std::string,int> wordToInt;
+std::unordered_map<int, std::string> intToWord;
 int maxIndex = -1;
 
 bool inVector(std::string in);
 int indexInVector(std::string in);
-std::string getWord(int i);
 
 
 bool inVector(std::string in)
 {
-    return wordmap.find(in) != wordmap.end();
+    return wordToInt.find(in) != wordToInt.end();
 }
 
 int indexInVector(std::string in)
 {
-    return wordmap[in];
-}
-
-std::string getWord(int i)
-{
-    for(int j=0;j<(int)index.size();++j)
-    {
-        if(i == index[j])
-            return words[j];
-    }
-    return "";
+    return wordToInt[in];
 }
 
 int main()
@@ -52,7 +40,7 @@ int main()
         for(int i = 0; i < 288; ++i) getline(myfile,line);
         /* Actual used code*/
         int nope = 0;
-        while ( getline (myfile,line) && nope <= 100)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
+        while ( getline (myfile,line) && nope <= 50)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
         {
             nope++;
             if (line.length() >= 10)
@@ -70,9 +58,8 @@ int main()
                     if(!inVector(temp))
                     {
                         maxIndex++;
-                        wordmap[temp] = maxIndex;
-                        words.push_back(temp);
-                        index.push_back(maxIndex);
+                        wordToInt[temp] = maxIndex;
+                        intToWord[maxIndex] = temp;
                         sequence.push_back(maxIndex);
                     }
                     else
@@ -109,7 +96,7 @@ int main()
         //std::vector<int> ny = model.Viterbi(ny1);
 
         for(int i=0;i<(int)ny.size();++i)
-            std::cerr << getWord(ny[i]) << " ";
+            std::cerr << intToWord[ny[i]] << " ";
         std::cerr << "\n" << std::endl;
     }
 
