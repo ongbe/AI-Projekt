@@ -51,30 +51,34 @@ int main()
         /* Skip copyright notices etcetera */
         //for(int i = 0; i < 288; ++i) getline(myfile,line);
         /* Actual used code*/
-        while ( getline (myfile,line) )
+        while ( getline (myfile,line) && line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
         {
-            //std::cout << line << std::endl;
-            //spara ord + Baumwelch + add
-            //std::vector<int>sequence;
-            std::istringstream iss;
-            iss.str(line);
-            while (!iss.eof())
+            if (line.length() >= 10)
             {
-                std::string temp;
-                iss >> temp;
-                //std::cerr << temp << std::endl;
-                if(!inVector(temp))
+                //std::cout << line << std::endl;
+                //spara ord + Baumwelch + add
+                //std::vector<int>sequence;
+                std::istringstream iss;
+                iss.str(line);
+                while (!iss.eof())
                 {
-                    maxIndex++;
-                    wordmap[temp] = maxIndex;
-                    words.push_back(temp);
-                    index.push_back(maxIndex);
-                    sequence.push_back(maxIndex);
+                    std::string temp;
+                    iss >> temp;
+                    //std::cerr << temp << std::endl;
+                    if(!inVector(temp))
+                    {
+                        maxIndex++;
+                        wordmap[temp] = maxIndex;
+                        words.push_back(temp);
+                        index.push_back(maxIndex);
+                        sequence.push_back(maxIndex);
+                    }
+                    else
+                    {
+                        sequence.push_back(indexInVector(temp));
+                    }
                 }
-                else
-                {
-                    sequence.push_back(indexInVector(temp));
-                }
+                //sequences.push_back(sequence);
             }
         }
         myfile.close();
