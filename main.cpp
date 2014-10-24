@@ -5,6 +5,7 @@
 #include <cstring>
 #include <sstream>
 #include <unordered_set>
+#include <cmath>
 
 std::unordered_set<std::string> wordset;
 std::vector<std::string> words;
@@ -97,7 +98,12 @@ int main()
     model.BaumWelch(sequence);
     model.add();
     std::cerr << "Baum-Welch + add done" << std::endl;
-    std::vector<int> test =  {1,2,3,1,2,3,1,1,2,3,1,2,3,1};
+    //std::vector<int> test =  {1,2,3,1,2,3,1,1,2,3,1,2,3,1};
+    std::vector<int> test(7, 1);
+    for (int i=0; i<test.size(); i++)
+    {
+        test[i] = (100*rand())%maxIndex;
+    }
     std::vector<int> ny = model.Viterbi(test);
 
     for(int i=0;i<(int)ny.size();++i)
