@@ -56,30 +56,33 @@ int main()
         /* Actual used code*/
         while ( getline (myfile,line) )
         {
-            //std::cout << line << std::endl;
-            //spara ord + Baumwelch + add
-            //std::vector<int>sequence;
-            std::istringstream iss;
-            iss.str(line);
-            while (!iss.eof())
+            if (line.length() >= 10)
             {
-                std::string temp;
-                iss >> temp;
-                //std::cerr << temp << std::endl;
-                if(!inVector(temp))
+                //std::cout << line << std::endl;
+                //spara ord + Baumwelch + add
+                //std::vector<int>sequence;
+                std::istringstream iss;
+                iss.str(line);
+                while (!iss.eof())
                 {
-                    maxIndex++;
-                    wordset.insert(temp);
-                    words.push_back(temp);
-                    index.push_back(maxIndex);
-                    sequence.push_back(maxIndex);
+                    std::string temp;
+                    iss >> temp;
+                    //std::cerr << temp << std::endl;
+                    if(!inVector(temp))
+                    {
+                        maxIndex++;
+                        wordset.insert(temp);
+                        words.push_back(temp);
+                        index.push_back(maxIndex);
+                        sequence.push_back(maxIndex);
+                    }
+                    else
+                    {
+                        sequence.push_back(indexInVector(temp));
+                    }
                 }
-                else
-                {
-                    sequence.push_back(indexInVector(temp));
-                }
+                //sequences.push_back(sequence);
             }
-            //sequences.push_back(sequence);
         }
         myfile.close();
     }
