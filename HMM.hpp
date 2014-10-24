@@ -8,8 +8,8 @@
 class HMM
 {
 private:
-    int N;// = 9;
-    int M;// = 9;
+    int N;// = 9; States
+    int M;// = 9; Observations
     bool converged;// = true;
     double**A;
     double**B;
@@ -17,7 +17,7 @@ private:
     double*qT;
 
 public:
-	/**Contructor*/
+	/**Contructor - generate matrices*/
 	HMM(int n, int m)
 	{
 		N=n;
@@ -50,7 +50,7 @@ public:
         return temp;
     }
 
-	/** sets A,b,q to random values */
+	/** sets A,b,q to random values (starting guess)*/
 	void reset()
     {
         //A
