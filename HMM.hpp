@@ -14,7 +14,6 @@ private:
     double**A;
     double**B;
     double*q;
-    double*qT;
 
 public:
 	/**Contructor - generate matrices*/
@@ -34,8 +33,6 @@ public:
 			B[i] = (double*)calloc(M,sizeof(double));
 		//q
 		q = (double*)calloc(N,sizeof(double));
-		//qT q at last timestep
-		qT = (double*)calloc(N,sizeof(double));
 
 		converged = false;
 	}
@@ -326,7 +323,6 @@ public:
             for(int i=0;i<N;++i)
             {
                 q[i] = Gamma[0][i];
-                qT[i] = alpha[T-1][i];
             }
 
             /*A*/
