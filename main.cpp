@@ -4,13 +4,13 @@
 #include <fstream>
 #include <cstring>
 #include <sstream>
-#include <unordered_set>
+#include <unordered_map>
 #include <cmath>
 
-std::unordered_set<std::string> wordset;
+//std::unordered_set<std::string> wordset;
+std::unordered_map<std::string,int> wordmap;
 std::vector<std::string> words;
 std::vector<int> index;
-//std::vector< std::vector<int> > sequences;
 int maxIndex = -1;
 
 bool inVector(std::string in);
@@ -20,15 +20,12 @@ std::string getWord(int i);
 
 bool inVector(std::string in)
 {
-    if(wordset.find(in) != wordset.end()) return true;
-    else return false;
+    return wordmap.find(in) != wordmap.end();
 }
 
 int indexInVector(std::string in)
 {
-    std::unordered_set<std::string>::const_iterator i = wordset.find(in);
-    if (i != wordset.end()) return 0;
-    else return -1;
+    return wordmap[in];
 }
 
 std::string getWord(int i)
@@ -56,32 +53,28 @@ int main()
         /* Actual used code*/
         while ( getline (myfile,line) )
         {
-            if (line.length() >= 10)
+            //std::cout << line << std::endl;
+            //spara ord + Baumwelch + add
+            //std::vector<int>sequence;
+            std::istringstream iss;
+            iss.str(line);
+            while (!iss.eof())
             {
-                //std::cout << line << std::endl;
-                //spara ord + Baumwelch + add
-                //std::vector<int>sequence;
-                std::istringstream iss;
-                iss.str(line);
-                while (!iss.eof())
+                std::string temp;
+                iss >> temp;
+                //std::cerr << temp << std::endl;
+                if(!inVector(temp))
                 {
-                    std::string temp;
-                    iss >> temp;
-                    //std::cerr << temp << std::endl;
-                    if(!inVector(temp))
-                    {
-                        maxIndex++;
-                        wordset.insert(temp);
-                        words.push_back(temp);
-                        index.push_back(maxIndex);
-                        sequence.push_back(maxIndex);
-                    }
-                    else
-                    {
-                        sequence.push_back(indexInVector(temp));
-                    }
+                    maxIndex++;
+                    wordmap[temp] = maxIndex;
+                    words.push_back(temp);
+                    index.push_back(maxIndex);
+                    sequence.push_back(maxIndex);
                 }
-                //sequences.push_back(sequence);
+                else
+                {
+                    sequence.push_back(indexInVector(temp));
+                }
             }
         }
         myfile.close();
@@ -93,25 +86,26 @@ int main()
 
     std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
 
-    //for(int i=0;i<(int)temp.size();++i)
-    //    std::cerr << temp[i] << " ";      // <------------Här skrivs 0:an ut, Det är för att den första sekvensen har längden 1 och endast
-    //std::cerr << std::endl;               //              innehåller en 0:a.
-
     std::cerr << "Baum-Welch" << std::endl;
     model.BaumWelch(sequence);
     model.add();
     std::cerr << "Baum-Welch + add done" << std::endl;
-    //std::vector<int> test =  {1,2,3,1,2,3,1,1,2,3,1,2,3,1};
-    std::vector<int> test(7, 1);
-    for (int i=0; i<test.size(); i++)
-    {
-        test[i] = (100*rand())%maxIndex;
-    }
-    std::vector<int> ny = model.Generate(0,10);//model.Viterbi(test);
 
-    for(int i=0;i<(int)ny.size();++i)
-        std::cerr << getWord(ny[i]) << " ";
-    std::cerr << "\n" << std::endl;
+    for(int j=0; j<8; j++) //multiple sentence
+    {
+//        std::vector<int> test(15, 1); //decide size of sentence
+//        for (int i=0; i<test.size(); i++)
+//        {
+//            test[i] = (100*rand())%maxIndex;
+//        }
+        //std::vector<int> ny = model.Viterbi(test);
+        std::vector<int> ny = model.Generate(j,10);//model.Viterbi(test);
+        //std::vector<int> ny = model.Viterbi(ny1);
+
+        for(int i=0;i<(int)ny.size();++i)
+            std::cerr << getWord(ny[i]) << " ";
+        std::cerr << "\n" << std::endl;
+    }
 
 	return 0;
 }
