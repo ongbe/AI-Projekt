@@ -107,7 +107,7 @@ int main()
     {
         test[i] = (100*rand())%maxIndex;
     }
-    std::vector<int> ny = model.Viterbi(test);
+    std::vector<int> ny = model.Generate(0,10);//model.Viterbi(test);
 
     for(int i=0;i<(int)ny.size();++i)
         std::cerr << getWord(ny[i]) << " ";

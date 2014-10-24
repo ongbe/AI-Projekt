@@ -403,6 +403,30 @@ public:
         std::cerr << "Itterations " << itter << std::endl;
     }
 
+    /**Generate sequence*/
+    std::vector<int> Generate(int startIndex, int length)
+    {
+        std::vector<int> seq(length);
+        int index = startIndex;
+        seq[0] = index;
+        for(int i=1;i<length;++i)
+        {
+            int tempIndex = 0;
+            double maximum = 0;
+            for(int j=0;j<N;++j)
+            {
+                if(A[index][j]>maximum)
+                {
+                    tempIndex = j;
+                    maximum = A[index][j];
+                }
+            }
+            index = tempIndex;
+            seq[i] = index;
+        }
+        return seq;
+    }
+
     bool isConverged()
     {
         return converged;
