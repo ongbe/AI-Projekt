@@ -2,14 +2,14 @@
 #include "HMM.hpp"
 #include <vector>
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <sstream>
 #include <unordered_set>
 
 std::unordered_set<std::string> wordset;
 std::vector<std::string> words;
 std::vector<int> index;
-std::vector< std::vector<int> > sequences;
+//std::vector< std::vector<int> > sequences;
 int maxIndex = -1;
 
 bool inVector(std::string in);
@@ -43,18 +43,21 @@ std::string getWord(int i)
 int main()
 {
     std::string line;
-    //std::ifstream myfile ("poems.txt");
-    std::ifstream myfile("ShakespeareSonnets.txt");
+    std::ifstream myfile ("poems.txt");
+    //std::ifstream myfile("ShakespeareSonnets.txt");
+
+    std::vector<int>sequence;
+
     if (myfile.is_open())
     {
         /* Skip copyright notices etcetera */
-        for(int i = 0; i < 288; ++i) getline(myfile,line);
+        //for(int i = 0; i < 288; ++i) getline(myfile,line);
         /* Actual used code*/
         while ( getline (myfile,line) )
         {
             //std::cout << line << std::endl;
             //spara ord + Baumwelch + add
-            std::vector<int>sequence;
+            //std::vector<int>sequence;
             std::istringstream iss;
             iss.str(line);
             while (!iss.eof())
@@ -75,7 +78,7 @@ int main()
                     sequence.push_back(indexInVector(temp));
                 }
             }
-            sequences.push_back(sequence);
+            //sequences.push_back(sequence);
         }
         myfile.close();
     }
@@ -84,29 +87,22 @@ int main()
     HMM model(maxIndex+1,maxIndex+1);
     model.reset();
 
-    std::cerr << "max i: " << sequences.size() << std::endl;
+    std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
 
-    for(int i=0;i<(int)sequences.size();++i)
-    {
-        std::cerr << "for-loop, i=" << i << std::endl;
-        std::vector<int> temp = sequences[i];
+    //for(int i=0;i<(int)temp.size();++i)
+    //    std::cerr << temp[i] << " ";      // <------------Här skrivs 0:an ut, Det är för att den första sekvensen har längden 1 och endast
+    //std::cerr << std::endl;               //              innehåller en 0:a.
 
-        std::cerr << "sequence.size(): "<< temp.size() << "  " << std::endl;
+    std::cerr << "Baum-Welch" << std::endl;
+    model.BaumWelch(sequence);
+    model.add();
+    std::cerr << "Baum-Welch + add done" << std::endl;
+    std::vector<int> test =  {1,2,3,1,2,3,1,1,2,3,1,2,3,1};
+    std::vector<int> ny = model.Viterbi(test);
 
-        for(int i=0;i<(int)temp.size();++i)
-            std::cerr << temp[i] << " ";      // <------------Här skrivs 0:an ut, Det är för att den första sekvensen har längden 1 och endast
-        std::cerr << std::endl;               //              innehåller en 0:a.
+    for(int i=0;i<(int)ny.size();++i)
+        std::cerr << getWord(ny[i]) << " ";
+    std::cerr << "\n" << std::endl;
 
-        std::cerr << "Baum-Welch" << std::endl;
-        model.BaumWelch(temp);
-        model.add();
-        std::cerr << "Baum-Welch + add done" << std::endl;
-
-        std::vector<int> ny = model.Viterbi(temp);
-
-        for(int i=0;i<(int)ny.size();++i)
-            std::cerr << getWord(ny[i]) << " ";
-        std::cerr << "\n" << std::endl;
-    }
 	return 0;
 }
