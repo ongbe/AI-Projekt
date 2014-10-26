@@ -158,15 +158,44 @@ public:
     */
     double** ElementMult(double** matrix1,double** matrix2, bool T1, bool T2)
     {
-
-        return initialize(N,N);
+        double** matrix = initialize(N,N);
+        for(int i=0; i<N; i++)
+        {
+            for(int j=0; j<N; j++)
+            {
+                if (T1 == false && T2 == false)
+                {
+                    matrix[i][j] = matrix1[i][j]*matrix2[i][j];
+                }
+                else if (T1 == true && T2 == false)
+                {
+                    matrix[i][j] = matrix1[j][i]*matrix2[i][j];
+                }
+                else if (T1 == true && T2 == false)
+                {
+                    matrix[i][j] = matrix1[i][j]*matrix2[j][i];
+                }
+                else if (T1 == true && T2 == false)
+                {
+                    matrix[i][j] = matrix1[j][i]*matrix2[j][i];
+                }
+            }
+        }
+        return matrix;
     }
 
     /**Element division */
     double** ElementDiv(double** matrix1,double** matrix2)
     {
-
-        return initialize(N,N);
+        double** matrix = initialize(N,N);
+        for(int i=0; i<N; i++)
+        {
+            for(int j=0; j<N; j++)
+            {
+                matrix[i][j] = matrix1[i][j]/matrix2[i][j];
+            }
+        }
+        return matrix;
     }
 
     double** ElementAdd(double** matrix1,double** matrix2)
