@@ -78,6 +78,9 @@ public:
     void learn(std::vector<int> input)
     {
         double** C = initialize(N,N);
+        for(int i=0;i<N;++i)
+            for(int j=0;j<N;++j)
+                C[i][j] = 1;
 
         //Initialize C
         for(int i=0; i<input.size()-1; i++)
