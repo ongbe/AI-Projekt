@@ -96,7 +96,7 @@ int main()
 //            test[i] = (100*rand())%maxIndex;
 //        }
         //std::vector<int> ny = model.Viterbi(test);
-        std::vector<int> ny(10,1);// = model.Generate(j,10);//model.Viterbi(test);
+        std::vector<int> ny = model.Generate(j,10);//model.Viterbi(test);
         //std::vector<int> ny = model.Viterbi(ny1);
 
         for(int i=0;i<(int)ny.size();++i)

@@ -142,14 +142,73 @@ public:
 
     }
 
+
     /**regular matrix multiplication
      * T1=true -> left matrix is transposed
      * T2=true -> right matrix is transposed
     */
-    double** Mult(double** matrix1,double** matrix2, bool T1, bool T2)
+    double** Mult(double** matrix1,double** matrix2, bool t1, bool t2)
     {
+        bool T1 = t1;
+        bool T2 = t2;
+        double** temp = initialize(N,N);
+        double t;
+		int i,j,k;
 
-        return initialize(N,N);
+
+		if(T1 && T2)
+        {
+            double**t = matrix1;
+            matrix1 = matrix2;
+            matrix2 = t;
+            T1 = false;
+            T2 = false;
+        }
+
+        if(!T1 && T2)
+        {
+            double**t = matrix1;
+            matrix1 = matrix2;
+            matrix2 = t;
+            T1 = true;
+            t2 = false;
+        }
+
+
+
+		//RÄKNA! (vanligt)
+		if(!T1 && !T2)
+        {
+            for (i=0;i<N;++i)
+            {
+                for(j=0;j<N;++j)
+                {
+                    t = 0;
+                    for(k=0;k<N;++k)
+                        t+= matrix1[i][k] * matrix2[k][j];
+                    temp[i][j] = t;
+                }
+            }
+        }
+
+        //RÄKNA! (matrix 1 transpose) (T1 true, T2 false)
+		if(T1 && !T2)
+        {
+            for (i=0;i<N;++i)
+            {
+                for(j=0;j<N;++j)
+                {
+                    t = 0;
+                    for(k=0;k<N;++k)
+                        t+= matrix1[k][i] * matrix2[k][j];
+                    temp[i][j] = t;
+                }
+            }
+        }
+
+
+		//std::cerr << "Mult klar" << std::endl;
+        return temp;//initialize(N,N);
     }
 
     /**Element multiplication
@@ -171,11 +230,11 @@ public:
                 {
                     matrix[i][j] = matrix1[j][i]*matrix2[i][j];
                 }
-                else if (T1 == true && T2 == false)
+                else if (T1 == false && T2 == true)
                 {
                     matrix[i][j] = matrix1[i][j]*matrix2[j][i];
                 }
-                else if (T1 == true && T2 == false)
+                else if (T1 == true && T2 == true)
                 {
                     matrix[i][j] = matrix1[j][i]*matrix2[j][i];
                 }
@@ -212,7 +271,7 @@ public:
     }
 
     /**Generate sequence*/
-    /*std::vector<int> Generate(int startIndex, int length)
+    std::vector<int> Generate(int startIndex, int length)
     {
         std::vector<int> seq(length);
         int index = startIndex;
@@ -223,15 +282,15 @@ public:
             double maximum = 0;
             for(int j=0;j<N;++j)
             {
-                if(A.A[index][j]>maximum)
+                if(A[index][j]>maximum)
                 {
                     tempIndex = j;
-                    maximum = A.A[index][j];
+                    maximum = A[index][j];
                 }
             }
             index = tempIndex;
             seq[i] = index;
         }
         return seq;
-    }*/
+    }
 };
