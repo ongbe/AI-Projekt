@@ -72,15 +72,73 @@ public:
         }
     }
 
-    /**uses the sequence "input" to train the hmm-model*/
+    /**uses the sequence "input" to train the hmm-model
+    * input = the emission sequence
+    */
     void learn(std::vector<int> input)
     {
         double** C = initialize(N,N);
 
-        //fixa C!
+        //Initialize C
+        for(int i=0; i<input.size()-1; i++)
+        {
+            C[input[i]][input[i+1]] += 1;
+        }
 
+        double** R = initialize(N,N);
+        double** RB = initialize(N,N);
+        double** Add = initialize(N,N);
+        int it = 0;
         //Iterate
+        while (it < 5)
+        {
+            R = ElementDiv(C, Mult(Mult(B,A, false, false), B, false, true));
+            RB = Mult(R, B, false, false);
+            A = ElementMult(A, Mult(B, RB, true, false), false, false);
+            Add = ElementAdd(Mult(RB, A, false, true), Mult(R, Mult(B, A, false, false), true, false));
+            B = ElementMult(B, Add, false, false);
 
+            //Normalize A (all entries) & B (columns)
+            int sumA = 0;
+            int sumB;
+            for(int i = 0; i<N; i++)
+            {
+                sumB = 0;
+                for(int j=0; j<N; j++)
+                {
+                    sumA += A[i][j];
+                    sumB += B[j][i];
+                }
+                for(int j=0; j<N; j++)
+                {
+                    B[j][i] = B[j][i]/sumB;
+                }
+            }
+            for(int i = 0; i<N; i++)
+            {
+                for(int j=0; j<N; j++)
+                {
+                    A[i][j] = A[i][j]/sumA;
+                }
+            }
+
+            it++;
+        }
+
+        //Normalize rows of A
+        int sumA;
+        for(int i = 0; i<N; i++)
+        {
+            sumA = 0;
+            for(int j=0; j<N; j++)
+            {
+                sumA += A[i][j];
+            }
+            for(int j=0; j<N; j++)
+            {
+                A[i][j] = A[i][j]/sumA;
+            }
+        }
 
     }
 
@@ -109,6 +167,19 @@ public:
     {
 
         return initialize(N,N);
+    }
+
+    double** ElementAdd(double** matrix1,double** matrix2)
+    {
+        double** matrix = initialize(N,N);
+        for(int i=0; i<N; i++)
+        {
+            for(int j=0; j<N; j++)
+            {
+                matrix[i][j] = matrix1[i][j] + matrix2[i][j];
+            }
+        }
+        return matrix;
     }
 
     /**Generate sequence*/
