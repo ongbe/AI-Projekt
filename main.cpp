@@ -107,6 +107,6 @@ int main()
         std::cerr << "\n" << std::endl;
     }
 
-    model.print();
+    //model.print();
 	return 0;
 }
