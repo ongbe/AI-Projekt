@@ -91,14 +91,17 @@ public:
         double** R = initialize(N,N);
         double** RB = initialize(N,N);
         double** Add = initialize(N,N);
+        double** BA = initialize(N,N);
         int it = 0;
         //Iterate
         while (it < 5)
         {
-            R = ElementDiv(C, Mult(Mult(B,A, false, false), B, false, true));
+            std::cerr << "iteration " << it << std::endl;
+            BA = Mult(B,A,false,false);
+            R = ElementDiv(C, Mult(BA, B, false, true));
             RB = Mult(R, B, false, false);
+            Add = ElementAdd(Mult(RB, A, false, true), Mult(R, BA, true, false));
             A = ElementMult(A, Mult(B, RB, true, false), false, false);
-            Add = ElementAdd(Mult(RB, A, false, true), Mult(R, Mult(B, A, false, false), true, false));
             B = ElementMult(B, Add, false, false);
 
             //Normalize A (all entries) & B (columns)
