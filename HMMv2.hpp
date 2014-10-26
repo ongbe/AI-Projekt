@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <limits>
+#include <fstream>
 
 class HMM
 {
@@ -88,7 +89,7 @@ public:
             C[input[i]][input[i+1]] += 1;
         }
 
-        /*
+
         double** R = initialize(N,N);
         double** RB = initialize(N,N);
         double** Add = initialize(N,N);
@@ -146,7 +147,7 @@ public:
                 A[i][j] = A[i][j]/sumA;
             }
         }
-    */
+    /*
         //normalize the rows in C
         double sum;
         for(int i=0;i<N;++i)
@@ -160,7 +161,7 @@ public:
             for(int j=0;j<N;++j)
                 A[i][j] = C[i][j]*sum;
         }
-    }
+    */}
 
     /**regular matrix multiplication
      * T1=true -> left matrix is transposed
@@ -311,5 +312,23 @@ public:
             seq[i] = index;
         }
         return seq;
+    }
+
+    void print () {
+      std::ofstream myfile("printout.txt");
+      if (myfile.is_open())
+      {
+          for(int i = 0; i < N; i++)
+          {
+              for(int j = 0; j<N; j++)
+              {
+                  myfile << A[i][j] << ", ";
+              }
+              myfile << "\n";
+
+          }
+        myfile.close();
+      }
+      else std::cout << "Unable to open file";
     }
 };

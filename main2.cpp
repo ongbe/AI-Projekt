@@ -80,6 +80,7 @@ int main()
     std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
 
     std::cerr << "Baum-Welch" << std::endl;
+    //model.learn(sequence);
     model.BaumWelch(sequence);
     model.add();
     std::cerr << "Baum-Welch + add done" << std::endl;

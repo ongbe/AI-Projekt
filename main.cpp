@@ -40,7 +40,7 @@ int main()
         for(int i = 0; i < 288; ++i) getline(myfile,line);
         /* Actual used code*/
         int nope = 0;
-        while ( getline (myfile,line) && line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
+        while ( getline (myfile,line) && nope <50)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
         {
             nope++;
             if (line.length() >= 10)
@@ -87,6 +87,8 @@ int main()
 
     //train hmm
     model.learn(sequence);
+    //model.BaumWelch(sequence);
+    //model.add();
 
     int rader = 10;
     for(int j=0; j<rader; j++) //multiple sentence
@@ -105,5 +107,6 @@ int main()
         std::cerr << "\n" << std::endl;
     }
 
+    model.print();
 	return 0;
 }

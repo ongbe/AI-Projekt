@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <limits>
+#include <fstream>
+
 class HMM
 {
 private:
@@ -426,6 +428,24 @@ public:
     bool isConverged()
     {
         return converged;
+    }
+
+    void print () {
+      std::ofstream myfile("printout.txt");
+      if (myfile.is_open())
+      {
+          for(int i = 0; i < N; i++)
+          {
+              for(int j = 0; j<N; j++)
+              {
+                  myfile << A[i][j] << ", ";
+              }
+              myfile << "\n";
+
+          }
+        myfile.close();
+      }
+      else std::cout << "Unable to open file";
     }
 
 };
