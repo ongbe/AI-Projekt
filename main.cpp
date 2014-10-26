@@ -1,5 +1,5 @@
 #include <iostream>
-#include "HMM.hpp"
+#include "HMMv2.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -78,11 +78,15 @@ int main()
     model.reset();
 
     std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
-
+    /*
     std::cerr << "Baum-Welch" << std::endl;
     model.BaumWelch(sequence);
     model.add();
     std::cerr << "Baum-Welch + add done" << std::endl;
+    */
+
+    //train hmm
+    model.learn(sequence);
 
     for(int j=0; j<8; j++) //multiple sentence
     {
@@ -92,7 +96,7 @@ int main()
 //            test[i] = (100*rand())%maxIndex;
 //        }
         //std::vector<int> ny = model.Viterbi(test);
-        std::vector<int> ny = model.Generate(j,10);//model.Viterbi(test);
+        std::vector<int> ny(10,1);// = model.Generate(j,10);//model.Viterbi(test);
         //std::vector<int> ny = model.Viterbi(ny1);
 
         for(int i=0;i<(int)ny.size();++i)
