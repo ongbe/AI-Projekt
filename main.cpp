@@ -40,7 +40,7 @@ int main()
         for(int i = 0; i < 288; ++i) getline(myfile,line);
         /* Actual used code*/
         int nope = 0;
-        while ( getline (myfile,line) && nope <= 50)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
+        while ( getline (myfile,line) && line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
         {
             nope++;
             if (line.length() >= 10)
@@ -88,15 +88,16 @@ int main()
     //train hmm
     model.learn(sequence);
 
-    for(int j=0; j<8; j++) //multiple sentence
+    int rader = 10;
+    for(int j=0; j<rader; j++) //multiple sentence
     {
-//        std::vector<int> test(15, 1); //decide size of sentence
-//        for (int i=0; i<test.size(); i++)
-//        {
-//            test[i] = (100*rand())%maxIndex;
-//        }
+        std::vector<int> test(rader, 1); //decide size of sentence
+        for (int i=0; i<test.size(); i++)
+        {
+            test[i] = (100*rand())%maxIndex;
+        }
         //std::vector<int> ny = model.Viterbi(test);
-        std::vector<int> ny = model.Generate(j,10);//model.Viterbi(test);
+        std::vector<int> ny = model.Generate(test[j],10);//model.Viterbi(test);
         //std::vector<int> ny = model.Viterbi(ny1);
 
         for(int i=0;i<(int)ny.size();++i)

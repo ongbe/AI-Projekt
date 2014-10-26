@@ -88,6 +88,7 @@ public:
             C[input[i]][input[i+1]] += 1;
         }
 
+        /*
         double** R = initialize(N,N);
         double** RB = initialize(N,N);
         double** Add = initialize(N,N);
@@ -145,9 +146,21 @@ public:
                 A[i][j] = A[i][j]/sumA;
             }
         }
-
+    */
+        //normalize the rows in C
+        double sum;
+        for(int i=0;i<N;++i)
+        {
+            sum=0;
+            for(int j=0;j<N;++j)
+            {
+                sum += C[i][j];
+            }
+            sum = 1./sum;
+            for(int j=0;j<N;++j)
+                A[i][j] = C[i][j]*sum;
+        }
     }
-
 
     /**regular matrix multiplication
      * T1=true -> left matrix is transposed
