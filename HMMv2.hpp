@@ -96,11 +96,11 @@ public:
         double** BA = initialize(N,N);
         int it = 0;
         //Iterate
-        while (it < 2)
+        while (it < 20)
         {
             std::cerr << "iteration " << it << std::endl;
             BA = Mult(B,A,false,false);
-            print(BA);
+            //print(BA);
             R = ElementDiv(C, Mult(BA, B, false, true));
             RB = Mult(R, B, false, false);
             Add = ElementAdd(Mult(RB, A, false, true), Mult(R, BA, true, false));
@@ -122,7 +122,7 @@ public:
                 {
                     B[j][i] = B[j][i]/sumB;
                 }
-                std::cerr << "normalize B, " <<sumB << std::endl;
+                //std::cerr << "normalize B, " <<sumB << std::endl;
             }
             for(int i = 0; i<N; i++)
             {
@@ -130,7 +130,7 @@ public:
                 {
                     A[i][j] = A[i][j]/sumA;
                 }
-                std::cerr << "normalize A, " <<sumA << std::endl;
+                //std::cerr << "normalize A, " <<sumA << std::endl;
             }
 
             it++;
@@ -149,7 +149,7 @@ public:
             {
                 A[i][j] = A[i][j]/sumA;
             }
-            std::cerr << "normalize A, " <<sumA << std::endl;
+            //std::cerr << "normalize A, " <<sumA << std::endl;
         }
     /*
         //normalize the rows in C
@@ -179,7 +179,6 @@ public:
         double t;
 		int i,j,k;
 
-
 		if(T1 && T2)
         {
             double**t = matrix1;
@@ -188,6 +187,22 @@ public:
             T1 = false;
             T2 = false;
         }
+
+        if(T1 && !T2)
+        {
+            for (i=0;i<N;++i)
+            {
+                for(j=0;j<N;++j)
+                {
+                    t = 0;
+                    for(k=0;k<N;++k)
+                        t+= matrix1[k][j] * matrix2[i][k];
+                    temp[j][i] = t;
+                }
+            }
+        }
+
+
 
 		//RÄKNA! (vanligt)
 		if(!T1 && !T2)
@@ -204,8 +219,8 @@ public:
             }
         }
 
-        //RÄKNA! (matrix 1 transpose) (T1 true, T2 false)
-		if(T1 && !T2)
+        //RÄKNA! (matrix 2 transpose)
+		if(!T1 && T2)
         {
             for (i=0;i<N;++i)
             {
@@ -214,20 +229,6 @@ public:
                     t = 0;
                     for(k=0;k<N;++k)
                         t+= matrix1[k][i] * matrix2[k][j];
-                    temp[i][j] = t;
-                }
-            }
-        }
-
-        if(!T1 && T2)
-        {
-            for (i=0;i<N;++i)
-            {
-                for(j=0;j<N;++j)
-                {
-                    t = 0;
-                    for(k=0;k<N;++k)
-                        t+= matrix1[i][k] * matrix2[j][k];
                     temp[i][j] = t;
                 }
             }
@@ -279,7 +280,7 @@ public:
             for(int j=0; j<N; j++)
             {
                 matrix[i][j] = matrix1[i][j]/matrix2[i][j];
-                std::cerr << "element div. " << matrix2[i][j] << std::endl;
+                //std::cerr << "element div. " << matrix2[i][j] << std::endl;
             }
         }
         return matrix;
