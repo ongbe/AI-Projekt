@@ -1,0 +1,115 @@
+For example, if "at' appears 10,000 times in the training
+corpus and it is followed by "gun" 37 times, then ~l(~un,~a,=-l )3 7/10,000, where by
+P we mean the estimated probability. After such training one would expect "I have" and
+"a gun" to have high estimated probabilities, while "I has" and "an gun" would have low
+probabilities. Figure 15.21 shows some bigram counts derived from the words in this book.
+TRIGRAM It is possible to go to a trigram model that provi~desv alues for P(W,~W,-~W,T-h~i)s .
+is a more powerful language model, capable of judging that "ate ;a banana" is more likely than
+"ate a bandanna." For trigram models and to a lesser extent for bigram and unigram models,
+there is a problem with counts of zero: We wouldn't want to say that a combination of words
+is impossible just because they didn't happen to appear in the training corpus. The process
+of smoothing gives a small non-zero probability to such clombinations. It is discussed on
+page 835.
+Bigram or trigram models are not as sophisticated as some of the grammar models we
+will see in Chapters 22 and 23, but they account for lolcal context-sensitive effects better and
+manage to capture some local syntax.
+For example, the fact that the word pairs ''I has" and
+"man have" get low scores is reflective of subject-verb agreement. The problem is that these
+relationships can be detected only locally: "the man have" gets a low score, but "the man
+with the yellow hat have" is not penalized.
+Now we consider how to combine the language model with the word models, so that we
+can handle word sequences properly. We'll assume a bigranl language model for simplicity.
+With such a model, we can combine all the word models ('which are composed in turn of
+pronunciation models and phone models) into one large HPidM model.
+A state in a singleword
+HMM is a frame labeled by the current phone anid phone state (for example, [m]o,,,t);
+a state in a continuous-speech HMM is also labeled with a word, as in [m]EzF. If each
+word has an average of p three-state phones in its pronunciation model, and there are W
+is
+83332
+29
+450
+1
+0
+3
+0
+on
+9424
+1
+21
+4
+1
+2
+0
+to from
+13:r
+0
+4
+2
+14.
+3
+0 0
+576 Chapter 15. Probabilistic Reasoning over Time
+words, then the continuous-speech HMM has 3pW states. Transitions can occur between
+phone states within a given phone, between phones in a given word, and between the final
+state of one word and the initial state of another. The transitions between words occur with
+probabilities specified by the bigram model.
+Once we have constructed the combined HMM, we can use it to analyze the continuous
+speech signal. In particular, the Viterbi algorithm embodied in Equation (15.9) can be used
+to find the most likely state sequence. From this state sequence, we can then extract a word
+sequence simply by reading the word labels from the states. Thus, the Viterbi algorithm
+solves the word segmentation problem by using dynamic programming to consider (in effect)
+all possible word sequences and word boundaries simultaneously.
+Notice that we didn't say "we can extract the most likely word sequence." The most
+likely word sequence is not necessarily the one that contains the most likely state sequence.
+This is because the probability of a word sequence is the sum of the probabilities over all possible
+state sequences consistent with that word sequence. Comparing two word sequences,
+say, "a back and "aback," it might be that case that there are ten alternative state sequences
+for "a back," each with probability 0.03, but just one state sequence for "aback," with probability
+0.20. Viterbi chooses "aback," but "a back" is actually more likely.
+In practice, this difficulty is not life-threatening, but it is serious enough that other
+A* DECODER approaches have been tried. The most common is the A* decoder, which makes ingenious
+use of A* search (see Chapter 4) to find the most likely word sequence. The idea is to view
+each word sequence as a path through a graph whose nodes are labeled with words. The
+successors of a node are all the words that can come next; thus, the graph for all sentences of
+length n or less has n layers, each of width at most W, where W is the number of possible
+words.
+The quality of a speech recognition system depends on the quality of all of its componentsthe
+language model, the word pronunciation models, the phone models, and the signal processing
+algorithms used to extract spectral features from the acoustic signal. We have discussed
+how the language model can be constructed, and we leave the details of signal processing
+to other textbooks. We are left with the pronunciation and phone models. The structure of
+the pronunciation models-such as the tomato models in Figure 15.19-is usually developed
+by hand. Large pronunciation dictionaries are now available for English and other languages,
+although their accuracy varies greatly. The structure of the three-state phone models is the
+Section 15.6. Speech Recognition 577
+same for a11 phones, as shown in Figure 15.20. That leaves the probabilities themselves.
+How are these to be obtained, given that the models c~ouldr equire hundreds of thousands or
+millions of parameters?
+The only plausible method is to learn the models from actual speech data, of which there
+is certainly no shortage. The next question is how to clo the learning. We give the answer in
+full in Chapter 20, but we can present the main ideas here. Consider the bigram language
+model; we explained how to learn it by looking at frequencies of word pairs in actual text.
+Can we do the same for, say, phone transition probabilities in the pronunciation model? The
+answer is yes, but only if someone goes to the trouble of annotating every occurrence of each
+word with the right phone sequence. This is a difficult and error-prone task, but it has been
+carried out for some standard data sets containing several hours of speech. If we know the
+phone sequences, we can estimate transition probabilities for the pronunciation models from
+frequencies of phone pairs. Similarly, if we are given the phone state for each frame-an even
+more excruciating manual labeling task-then we can estimate transition probabililies for the
+phone models. Given the phone state and the acoustic features in each frame, we can also
+estimate the acoustic model, either directly from frequenci~es( for VQ models) or by using
+statistical fitting methods (for mixture-of-Gaussian maldels; :see Chapter 20).
+The cost and rarity of hand-labeled data, and the fact that the available hand-labeled data
+sets might not represent the kinds of speakers and acou,stic conditions found in a new recognition
+context, could doom this approach to failure. Forrfimately, the expectation-maximization
+or EM algorithm learns HMM transition and sensor models without the need for labeled data.
+Estimates derived from hand-labeled data can be used to initialize the models; after that, EM
+takes over and trains the models for the task at hand. The idea is simple: given an HMM and
+an observation sequence, we can use the smoothing algorithms from Sections 15.2 and 15.3
+to compute the probability of each state at each time step and. by a simple extension, the probability
+of each state-state pair at consecutive time steps. These probabilities can be viewed
+as uncertain labels. From the uncertain labels, we can estlmate new transition and sensor
+probabilities, and the EM procedure repeats. The method is guaranteed to increase the fit
+between model and data on each iteration, and it generally converges to a much better set of
+parameter values than those provided by the initial, hand-labeled estimates.

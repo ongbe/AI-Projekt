@@ -79,93 +79,102 @@ public:
     void learn(std::vector<int> input)
     {
         double** C = initialize(N,N);
+        std::vector<double> p(N,0.);
         for(int i=0;i<N;++i)
             for(int j=0;j<N;++j)
                 C[i][j] = 1;
 
         //Initialize C
+        // Bigram
         for(int i=0; i<input.size()-1; i++)
         {
             C[input[i]][input[i+1]] += 1;
+            p[input[i]] += 1;
         }
 
-
-        double** R = initialize(N,N);
-        double** RB = initialize(N,N);
-        double** Add = initialize(N,N);
-        double** BA = initialize(N,N);
-        int it = 0;
-        //Iterate
-        while (it < 20)
+        for(int i=0; i<input.size()-1; i++)
         {
-            std::cerr << "iteration " << it << std::endl;
-            BA = Mult(B,A,false,false);
-            //print(BA);
-            R = ElementDiv(C, Mult(BA, B, false, true));
-            RB = Mult(R, B, false, false);
-            Add = ElementAdd(Mult(RB, A, false, true), Mult(R, BA, true, false));
-            A = ElementMult(A, Mult(B, RB, true, false), false, false);
-            B = ElementMult(B, Add, false, false);
-
-            //Normalize A (all entries) & B (columns)
-            int sumA = 0;
-            int sumB;
-            for(int i = 0; i<N; i++)
-            {
-                sumB = 0;
-                for(int j=0; j<N; j++)
-                {
-                    sumA += A[i][j];
-                    sumB += B[j][i];
-                }
-                for(int j=0; j<N; j++)
-                {
-                    B[j][i] = B[j][i]/sumB;
-                }
-                //std::cerr << "normalize B, " <<sumB << std::endl;
-            }
-            for(int i = 0; i<N; i++)
-            {
-                for(int j=0; j<N; j++)
-                {
-                    A[i][j] = A[i][j]/sumA;
-                }
-                //std::cerr << "normalize A, " <<sumA << std::endl;
-            }
-
-            it++;
+            A[input[i]][input[i+1]] = C[input[i]][input[i+1]]/p[input[i]];
         }
 
-        //Normalize rows of A
-        int sumA;
-        for(int i = 0; i<N; i++)
-        {
-            sumA = 0;
-            for(int j=0; j<N; j++)
-            {
-                sumA += A[i][j];
-            }
-            for(int j=0; j<N; j++)
-            {
-                A[i][j] = A[i][j]/sumA;
-            }
-            //std::cerr << "normalize A, " <<sumA << std::endl;
-        }
-    /*
-        //normalize the rows in C
-        double sum;
-        for(int i=0;i<N;++i)
-        {
-            sum=0;
-            for(int j=0;j<N;++j)
-            {
-                sum += C[i][j];
-            }
-            sum = 1./sum;
-            for(int j=0;j<N;++j)
-                A[i][j] = C[i][j]*sum;
-        }
-    */}
+
+//        double** R = initialize(N,N);
+//        double** RB = initialize(N,N);
+//        double** Add = initialize(N,N);
+//        double** BA = initialize(N,N);
+//        int it = 0;
+//        //Iterate
+//        while (it < 20)
+//        {
+//            std::cerr << "iteration " << it << std::endl;
+//            BA = Mult(B,A,false,false);
+//            //print(BA);
+//            R = ElementDiv(C, Mult(BA, B, false, true));
+//            RB = Mult(R, B, false, false);
+//            Add = ElementAdd(Mult(RB, A, false, true), Mult(R, BA, true, false));
+//            A = ElementMult(A, Mult(B, RB, true, false), false, false);
+//            B = ElementMult(B, Add, false, false);
+//
+//            //Normalize A (all entries) & B (columns)
+//            int sumA = 0;
+//            int sumB;
+//            for(int i = 0; i<N; i++)
+//            {
+//                sumB = 0;
+//                for(int j=0; j<N; j++)
+//                {
+//                    sumA += A[i][j];
+//                    sumB += B[j][i];
+//                }
+//                for(int j=0; j<N; j++)
+//                {
+//                    B[j][i] = B[j][i]/sumB;
+//                }
+//                //std::cerr << "normalize B, " <<sumB << std::endl;
+//            }
+//            for(int i = 0; i<N; i++)
+//            {
+//                for(int j=0; j<N; j++)
+//                {
+//                    A[i][j] = A[i][j]/sumA;
+//                }
+//                //std::cerr << "normalize A, " <<sumA << std::endl;
+//            }
+//
+//            it++;
+//        }
+//
+//        //Normalize rows of A
+//        int sumA;
+//        for(int i = 0; i<N; i++)
+//        {
+//            sumA = 0;
+//            for(int j=0; j<N; j++)
+//            {
+//                sumA += A[i][j];
+//            }
+//            for(int j=0; j<N; j++)
+//            {
+//                A[i][j] = A[i][j]/sumA;
+//            }
+//            //std::cerr << "normalize A, " <<sumA << std::endl;
+//        }
+//    /*
+//        //normalize the rows in C
+//        double sum;
+//        for(int i=0;i<N;++i)
+//        {
+//            sum=0;
+//            for(int j=0;j<N;++j)
+//            {
+//                sum += C[i][j];
+//            }
+//            sum = 1./sum;
+//            for(int j=0;j<N;++j)
+//                A[i][j] = C[i][j]*sum;
+//        }
+//    */
+    }
 
     /**regular matrix multiplication
      * T1=true -> left matrix is transposed
