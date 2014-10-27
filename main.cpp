@@ -29,7 +29,6 @@ int main()
         return 1;
     }
     HMM model(maxIndex+1,maxIndex+1);
-    model.reset();
 
     std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
     /*
