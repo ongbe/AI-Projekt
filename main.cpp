@@ -100,7 +100,8 @@ bool readFile(std::string in)
             getline(myfile, line);
 
         std::string lowercase = "abcdefghijklmnopqrstuvwxyz";
-        char unallowed[] = "()-,.!?:;";
+        char unallowed[] = " ()-,.!?:;";
+        unallowed[0] = '"';
         while ( getline (myfile,line)  && line != endLine)
         {
             /* Skip non-poem lines */
@@ -114,6 +115,7 @@ bool readFile(std::string in)
                 }
                 //spara ord + Baumwelch + add
                 //std::vector<int>sequence;
+                std::transform(line.begin(), line.end(), line.begin(), ::tolower);
                 std::istringstream iss;
                 iss.str(line);
                 while (!iss.eof())
