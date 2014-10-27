@@ -40,24 +40,26 @@ int main()
 
     //train hmm
     model.learn(sequence);
-    //model.BaumWelch(sequence);
-    //model.add();
 
-    int rader = 10;
-    for(int j=0; j<rader; j++) //multiple sentence
+    int rader = 11;
+    for(int j=0; j<rader; j++) //multiple sentences
     {
-        std::vector<int> test(rader, 1); //decide size of sentence
-        for (int i=0; i<test.size(); i++)
-        {
-            test[i] = (100*rand())%maxIndex;
-        }
-        //std::vector<int> ny = model.Viterbi(test);
-        std::vector<int> ny = model.Generate(test[j],10);//model.Viterbi(test);
-        //std::vector<int> ny = model.Viterbi(ny1);
+//        std::vector<int> test(rader, 1); //decide size of sentence
+//        for (int i=0; i<test.size(); i++)
+//        {
+//            test[i] = (100*rand())%maxIndex;
+//        }
+//        std::vector<int> ny = model.Generate(test[j],10);
+
+        std::string input;
+        std::cout<< "Word: ";
+        std::cin >> input;
+        int in = wordToInt[input];
+        std::vector<int> ny = model.Generate(in,10);
 
         for(int i=0;i<(int)ny.size();++i)
             std::cerr << intToWord[ny[i]] << " ";
-        std::cerr << std::endl;
+        std::cerr << "\n" << std::endl;
     }
 
     //model.print();
