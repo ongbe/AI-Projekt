@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <string>
 #include <cstddef>
 
 int syllables(std::string input);
@@ -24,14 +25,23 @@ std::string phonetics(std::string input)
     std::string ph=input;
 
     //1
-    for(int i=0; i<ph.length() ;++i)
+    //Drop duplicate adjacent letters, except for C
+    int l = ph.length();
+    for(int i=0; i<l ;++i)
     {
-        if(ph[i] == ph[i+1] && ph[i]!= 'c' && ph[i]!=' ')
-            ph[i+1]=' ';
+        if(ph[i] == ph[i+1] && ph[i]!= 'c')
+        {
+            ph.erase(i,1);
+            i--;
+            l--;
+        }
     }
-    //ph.clear();
-    ph.erase( remove( ph.begin(), ph.end(), ' ' ), ph.end() );
+
     std::cout << "1: " << ph << std::endl;
+
+    //2
+    //If the word begins with 'KN', 'GN', 'PN', 'AE', 'WR', drop the first letter
+    //if(ph.substr(0,1))
 
 
     return ph;
