@@ -40,7 +40,7 @@ int main()
         for(int i = 0; i < 288; ++i) getline(myfile,line);
         /* Actual used code*/
         int nope = 0;
-        while ( getline (myfile,line) && nope <50)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
+        while ( getline (myfile,line) && line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
         {
             nope++;
             if (line.length() >= 10)
@@ -75,7 +75,6 @@ int main()
     else std::cout << "Unable to open file";
     std::cout << "Reading done" << std::endl;
     HMM model(maxIndex+1,maxIndex+1);
-    model.reset();
 
     std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
     /*
@@ -99,11 +98,11 @@ int main()
             test[i] = (100*rand())%maxIndex;
         }
         //std::vector<int> ny = model.Viterbi(test);
-        std::vector<int> ny = model.Generate(test[j],10);//model.Viterbi(test);
+        std::vector<int> ny = model.Generate(test[j],40);//model.Viterbi(test);
         //std::vector<int> ny = model.Viterbi(ny1);
 
         for(int i=0;i<(int)ny.size();++i)
-            std::cerr << intToWord[ny[i]] << " ";
+            std::cerr << intToWord[ny[i]] << " " ;//<< ny[i] << " ";
         std::cerr << "\n" << std::endl;
     }
 
