@@ -41,12 +41,14 @@ std::string phonetics(std::string input)
 
     //2
     //If the word begins with 'KN', 'GN', 'PN', 'AE', 'WR', drop the first letter
-    if(ph.length()<2)
-        return ph;
+    //if(ph.length()<2)
+        //return ph;
 
     std::string s2 = ph.substr(0,2);
     if( s2 == "kn" || s2 == "gn" || s2 == "pn" || s2 == "ae" || s2 == "wr")
+    {
         ph.erase(0,1);
+    }
     std::cout <<"2: " << ph <<std::endl;
 
     //3
@@ -80,6 +82,7 @@ std::string phonetics(std::string input)
         found = input.find_first_of('c',found+1);
     }
     std::cout <<"4: " << ph <<std::endl;
+    l = ph.length();
 
     //5
     //'D' transforms to 'J' if followed by 'GE', 'GY', or 'GI'.
@@ -101,16 +104,28 @@ std::string phonetics(std::string input)
     std::cout << "5: " << ph << std::endl;
 
 
-    //6 - EJ FÄRDIG
+    //6 - kanske FÄRDIG
     //Drop 'G' if followed by 'H' and 'H' is not at the end or before a vowel
     //Drop 'G' if followed by 'N' or 'NED' and is at the end. (NED eller N i slutet)
     for(int i=0; i<l ;++i)
     {
         if(ph[i] == 'g' && ph[i+1] == 'h')
         {
-            ph.erase(i,1);
-            i--;
-            i--;
+            if ((i+1) <= (l-1) && ph[i+1] != 'a' && ph[i+1] != 'e' && ph[i+1] != 'i' && ph[i+1] != 'o' && ph[i+1] != 'u')
+            {
+                ph.erase(i,1);
+                i--;
+                l--;
+            }
+        }
+        if(ph[i] == 'g' && ph[i+1] == 'n')
+        {
+            if((i+1)==(l-1) || (ph[i+2] == 'e' && ph[i+2] == 'd'))
+            {
+                ph.erase(i,1);
+                i--;
+                l--;
+            }
         }
     }
     std::cout << "6: " << ph << std::endl;
@@ -122,7 +137,7 @@ std::string phonetics(std::string input)
     {
         if(ph[i] == 'g')
         {
-            if (ph[i+1] == 'i' || ph[i+1] == 'e' || ph[i+1] == 'y')
+            if ((ph[i+1] == 'i' || ph[i+1] == 'e' || ph[i+1] == 'y') && ph[i-1] != 'g')
             {
                 ph[i] = 'j';
             }
@@ -284,7 +299,8 @@ std::string phonetics(std::string input)
     {
         if(i != 0 && ph[i]=='x')
         {
-            ph[i] = 'ks'; //hur lägger man till??
+            ph.insert(i,"ks");
+            //ph[i] = 'ks'; //hur lägger man till??
             i++;
             i++; //?????
         }
