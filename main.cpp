@@ -57,7 +57,7 @@ int main()
 
         for(int i=0;i<(int)ny.size();++i)
             std::cerr << intToWord[ny[i]] << " ";
-        std::cerr << "\n" << std::endl;
+        std::cerr << std::endl;
     }
 
     //model.print();

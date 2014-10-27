@@ -38,10 +38,10 @@ public:
     */
     void learn(std::vector<int> input)
     {
-        std::vector<double> p(N,1.);
+        std::vector<double> p(N,1);
         for(int i=0;i<N;++i)
-        for(int j=0;j<N;++j)
-        A[i][j] = 0;
+            for(int j=0;j<N;++j)
+                A[i][j] = 0;
 
         // Bigram
         for(int i=0; i<input.size()-1; i++)
