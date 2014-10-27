@@ -51,7 +51,7 @@ public:
         }
         for(int i=input.size()-2; i>=0; i--)
         {
-            A[input[i+1]][input[i]] = A[input[i+1]][input[i]]/p[input[i+1]];
+            A[input[i+1]][input[i]] = A[input[i+1]][input[i]]/p[input[i]];
         }
     }
 

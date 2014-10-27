@@ -8,16 +8,18 @@
 #include <cmath>
 #include <algorithm>
 
-//std::unordered_set<std::string> wordset;
+/** Globals */
 std::unordered_map<std::string,int> wordToInt;
 std::unordered_map<int, std::string> intToWord;
 int maxIndex = -1;
+std::string line, input;
+std::vector<int>sequence;
 
+/** Functions */
 bool inVector(std::string);
 int indexInVector(std::string);
 bool readFile(std::string);
-std::string line;
-std::vector<int>sequence;
+std::string isRhyme(bool, std::string);
 
 int main()
 {
@@ -40,10 +42,28 @@ int main()
 
     //train hmm
     model.learn(sequence);
-
-    int rader = 11;
-    for(int j=0; j<rader; j++) //multiple sentences
+    bool newRhyme = true;
+    std::string rhymeA, rhymeB;
+    for(int j=0; j<14; ++j) //multiple sentences
     {
+        if(j>=12)
+        {
+            rhymeA = isRhyme(newRhyme, rhymeA);
+            newRhyme = (newRhyme==false);
+        }
+        else
+        {
+            if(j%2 == 0)
+            {
+                rhymeA = isRhyme(newRhyme, rhymeA);
+                newRhyme = (newRhyme==false);
+            }
+            else
+            {
+                rhymeB = isRhyme(!newRhyme, rhymeB);
+            }
+        }
+
 //        std::vector<int> test(rader, 1); //decide size of sentence
 //        for (int i=0; i<test.size(); i++)
 //        {
@@ -51,19 +71,33 @@ int main()
 //        }
 //        std::vector<int> ny = model.Generate(test[j],10);
 
-        std::string input;
-        std::cout<< "Word: ";
-        std::cin >> input;
         int in = wordToInt[input];
+
         std::vector<int> ny = model.Generate(in,10);
 
         for(int i=0;i<(int)ny.size();++i)
             std::cerr << intToWord[ny[i]] << " ";
-        std::cerr << "\n" << std::endl;
+        std::cerr << std::endl;
+        //in = model.rhyme(wordToInt(ny[(int)ny.size()-1]));
+
     }
 
     //model.print();
 	return 0;
+}
+
+std::string isRhyme(bool newRhyme, std::string in)
+{
+    if (newRhyme)
+    {
+        //New rhyme
+        std::cout<< "Word: ";
+        std::cin >> input;
+        return input;
+    }
+    else
+        input = in;
+        return in;
 }
 
 bool inVector(std::string in)
@@ -100,7 +134,7 @@ bool readFile(std::string in)
             getline(myfile, line);
 
         std::string lowercase = "abcdefghijklmnopqrstuvwxyz";
-        char unallowed[] = " ()-,.!?:;";
+        char unallowed[] = " -(),.!?:;";
         unallowed[0] = '"';
         while ( getline (myfile,line)  && line != endLine)
         {
