@@ -6,74 +6,28 @@
 #include <sstream>
 #include <unordered_map>
 #include <cmath>
+#include <algorithm>
 
 //std::unordered_set<std::string> wordset;
 std::unordered_map<std::string,int> wordToInt;
 std::unordered_map<int, std::string> intToWord;
 int maxIndex = -1;
 
-bool inVector(std::string in);
-int indexInVector(std::string in);
-
-
-bool inVector(std::string in)
-{
-    return wordToInt.find(in) != wordToInt.end();
-}
-
-int indexInVector(std::string in)
-{
-    return wordToInt[in];
-}
+bool inVector(std::string);
+int indexInVector(std::string);
+bool readFile(std::string);
+std::string line;
+std::vector<int>sequence;
 
 int main()
 {
-    std::string line;
-    //std::ifstream myfile ("poems.txt");
-    std::ifstream myfile("ShakespeareSonnets.txt");
+    bool one = readFile("ShakespeareSonnets.txt"), two = readFile("Petrarca.txt");
 
-    std::vector<int>sequence;
-
-    if (myfile.is_open())
+    if(!one && !two)
     {
-        /* Skip copyright notices etcetera */
-        for(int i = 0; i < 288; ++i) getline(myfile,line);
-        /* Actual used code*/
-        int nope = 0;
-        while ( getline (myfile,line) && nope <50)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
-        {
-            nope++;
-            if (line.length() >= 10)
-            {
-                //std::cout << line << std::endl;
-                //spara ord + Baumwelch + add
-                //std::vector<int>sequence;
-                std::istringstream iss;
-                iss.str(line);
-                while (!iss.eof())
-                {
-                    std::string temp;
-                    iss >> temp;
-                    //std::cerr << temp << std::endl;
-                    if(!inVector(temp))
-                    {
-                        maxIndex++;
-                        wordToInt[temp] = maxIndex;
-                        intToWord[maxIndex] = temp;
-                        sequence.push_back(maxIndex);
-                    }
-                    else
-                    {
-                        sequence.push_back(indexInVector(temp));
-                    }
-                }
-                //sequences.push_back(sequence);
-            }
-        }
-        myfile.close();
+        std::cerr << "Program interrupted." << std::endl;
+        return 1;
     }
-    else std::cout << "Unable to open file";
-    std::cout << "Reading done" << std::endl;
     HMM model(maxIndex+1,maxIndex+1);
     model.reset();
 
@@ -109,4 +63,84 @@ int main()
 
     //model.print();
 	return 0;
+}
+
+bool inVector(std::string in)
+{
+    return wordToInt.find(in) != wordToInt.end();
+}
+
+int indexInVector(std::string in)
+{
+    return wordToInt[in];
+}
+
+bool readFile(std::string in)
+{
+    /* Set variables */
+    std::string line, endLine;
+    std::ifstream myfile (in);
+    int start;
+    if (in == "Petrarca.txt")
+    {
+        start = 6638;
+        endLine = "INDEX.";
+    }
+    else
+    {
+        start = 288;
+        endLine = "End of The Project Gutenberg Etext of Shakespeare's Sonnets";
+    }
+
+    /* import file */
+    if (myfile.is_open())
+    {
+        for (int i = 0; i<6638; ++i)
+            getline(myfile, line);
+
+        std::string lowercase = "abcdefghijklmnopqrstuvwxyz";
+        char unallowed[] = "()-,.!?:;";
+        while ( getline (myfile,line)  && line != endLine)
+        {
+            /* Skip non-poem lines */
+            if (line.find_last_of (lowercase) != std::string::npos && line.find("_"))
+            {
+                /* Trim special characters */
+                for (unsigned int i = 0; i < strlen(unallowed); ++i)
+                {
+                  // you need include <algorithm> to use general algorithms like std::remove()
+                  line.erase (std::remove(line.begin(), line.end(), unallowed[i]), line.end());
+                }
+                //spara ord + Baumwelch + add
+                //std::vector<int>sequence;
+                std::istringstream iss;
+                iss.str(line);
+                while (!iss.eof())
+                {
+                    std::string temp;
+                    iss >> temp;
+                    //std::cerr << temp << std::endl;
+                    if(!inVector(temp))
+                    {
+                        maxIndex++;
+                        wordToInt[temp] = maxIndex;
+                        intToWord[maxIndex] = temp;
+                        sequence.push_back(maxIndex);
+                    }
+                    else
+                    {
+                        sequence.push_back(indexInVector(temp));
+                    }
+                }
+                //sequences.push_back(sequence);
+            }
+        }
+        myfile.close();
+        std::cout << "Reading " << in << " done" << std::endl;
+        return true;
+    }
+
+    else std::cout << "Unable to open "<< in << std::endl;
+    return false;
+
 }
