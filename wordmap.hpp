@@ -88,7 +88,7 @@ public:
                 }
             }
             myfile.close();
-            //std::cout << "Reading " << in << " done" << std::endl;
+            std::cout << "Reading " << in << " done" << std::endl;
             return true;
         }
 
