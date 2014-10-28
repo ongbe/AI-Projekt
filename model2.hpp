@@ -7,18 +7,25 @@
 #include <limits>
 #include <fstream>
 #include <unordered_map>
+//#import <utility>
 
-struct wordObj
-{
-    int word;
-    int p1;
-    int p2;
+class myHash{
+public:
+    size_t operator()(const std::vector<int> &k) const{
+        if (k.size() == 2)
+            return k[0] * 100 + k[1]; //CAUTION: Do NOT use if vector.size()
+        if (k.size() == 3)
+            return k[0] * 50 + k[1] + k[2] * 13;
+    }
+};
 
-    wordObj(int index, int plus1, int plus2)
+struct myEquals : std::binary_function<const std::vector<int>&, const std::vector<int>&, bool> {
+    result_type operator()( first_argument_type lhs, second_argument_type rhs ) const
     {
-        word = index;
-        p1 = plus1;
-        p2 = plus2;
+        if (lhs.size() == 2 && rhs.size() == 2)
+            return (lhs[0] == rhs[0] && lhs[1] == rhs[1]);
+        if (lhs.size() == 3 && rhs.size() == 3)
+            return (lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2]);
     }
 };
 
@@ -29,8 +36,8 @@ private:
     int M;// = 9; Observations
     //double** A;
     //int* p; //number of times each word occurs
-    std::unordered_map<int64_t, double> bigrams;
-    std::unordered_map<int64_t, double> trigrams;
+    std::unordered_map<std::vector<int>, double, myHash, myEquals> bigrams;
+    std::unordered_map<std::vector<int>, double, myHash, myEquals> trigrams;
 
 public:
     /**Contructor - generate matrices*/
@@ -62,10 +69,9 @@ public:
     {
         for (int i = input.size()-1; i > 1 ; i--)
         {
-            int tempBi[2] = {input[i],input[i-1]}, tempTri[3] = {input[i],input[i-1],input[i-2]};
-            int64_t t1 = (int64_t)tempBi, t2 = (int64_t)tempTri;
-            bigrams[t1] = (double)bigrams[t1]+1.; //If not previously existing (new bigram), automatically creates a node with value 0+1=1. Else, add 1 to value (count).
-            trigrams[t2] = (double)trigrams[t2]+1.;
+            std::vector<int> tempBi = {input[i],input[i-1]}, tempTri = {input[i],input[i-1],input[i-2]};
+            bigrams[tempBi]++; //If not previously existing (new bigram), automatically creates a node with value 0+1=1. Else, add 1 to value (count).
+            trigrams[tempTri]++;
         }
     }
 
@@ -118,15 +124,30 @@ public:
         double maxFreq = 0, tempVal1, tempVal2;
         for(int i = 0; i < N; i++)
         {
+            std::vector<int> tempBi = {lastWrd,i};
+            if (bigrams.find(tempBi) == bigrams.end())
+            {
+                tempVal2 = 1.;
+            }
+            else
+            {
+                std::cout << "ok\t" << i << "\t" << bigrams[tempBi] << std::endl;
+                tempVal2 = (double)(1.+bigrams[tempBi]);
+            }
+
             for(int j = 0; j < N; j++)
             {
                 //Count occurrences
-                int tempTri[3] = {lastWrd, i, j}, tempBi[2] = {lastWrd,i};
-                int64_t t1 = (int64_t)tempBi, t2 = (int64_t)tempTri;
-                if (trigrams.find(t2) == trigrams.end()) tempVal1 = 1.;
-                else tempVal1 = (trigrams[t2]+1.);
-                if (bigrams.find(t1) == bigrams.end()) tempVal2 = 1.;
-                else tempVal2 = (bigrams[t1]+1.);
+                std::vector<int> tempTri = {lastWrd, i, j};
+                if (trigrams.find(tempTri) == trigrams.end())
+                {
+                    tempVal1 = 1.;
+                }
+                else
+                {
+                    std::cout << "YES\t" << j << "\t" << trigrams[tempTri] << std::endl;
+                    tempVal1 = (double)(1.+trigrams[tempTri]--);
+                }
 
                 //Check if max
                 //std::cout << tempVal1 << "\t" << tempVal2 << std::endl;
@@ -142,23 +163,5 @@ public:
         out = Generate(bestWrd, length-1);
         out.push_back(lastWrd);
         return out;
-    }
-
-    void print (double ** AA)
-    {
-        std::ofstream myfile("printout.txt");
-        if (myfile.is_open())
-        {
-            for(int i = 0; i < N; i++)
-            {
-                for(int j = 0; j<N; j++)
-                {
-                    myfile << AA[i][j] << ", ";
-                }
-                myfile << "\n";
-            }
-            myfile.close();
-        }
-        else std::cout << "Unable to open file";
     }
 };
