@@ -58,6 +58,10 @@ public:
     /**Generate sequence*/
     std::vector<int> Generate(int stopIndex, int length)
     {
+        double val[N];
+        for(int i=0;i<N;++i)
+            val[i] = 1.;
+
         std::vector<int> seq(length);
         int index = stopIndex;
         seq[length-1] = index;
@@ -67,9 +71,20 @@ public:
             double maximum = 0;
             for(int j=0;j<N;++j)
             {
+                //bigram
+                /*
+                if(A[index][j]>maximum)
+                {
+                    tempIndex = j;
+                    maximum = A[index][j]*val[j];
+                }*/
+
+
+                //trigram
+
                 for(int k=0; k<N; k++)
                 {
-                    double temp = A[index][j]*A[j][k];
+                    double temp = A[index][j]*A[j][k]*val[j]*val[k];
                     //std::cerr << temp << std::endl;
                     if(temp>maximum)
                     {
@@ -79,6 +94,7 @@ public:
                 }
             }
             index = tempIndex;
+            val[index]*=0.5;
             seq[i] = index;
         }
         return seq;
