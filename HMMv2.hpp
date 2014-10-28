@@ -81,7 +81,7 @@ public:
 
 
                 //trigram
-
+                /*
                 for(int k=0; k<N; k++)
                 {
                     double temp = A[index][j]*A[j][k]*val[j]*val[k];
@@ -91,7 +91,25 @@ public:
                         tempIndex = j;
                         maximum = temp;
                     }
-                }
+                }*/
+
+                //quadgram
+                /*
+                std::cout << "ord: " << i << std::endl;
+                for(int k=0; k<N; k++)
+                {
+                    for(int l=0;l<N;++l)
+                    {§1§§§
+                        double temp = A[index][j]*A[j][k]*A[k][l]*val[j]*val[k]*val[l];
+                        if(temp>maximum)
+                        {
+                            tempIndex = j;
+                            maximum = temp;
+                        }
+                    }
+                }*/
+
+
             }
             index = tempIndex;
             val[index]*=0.5;
