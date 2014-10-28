@@ -104,49 +104,40 @@ std::string makeRhyme(bool newRhyme, std::string in)
 
 std::string Rhyme(std::string word)
 {
-    std::string phon = ourMap.phonetics(word);
-    //std::cerr << "Word to rhyme on: " << phon << std::endl;
-
-    //Iterate through all the words
-    int maxMatch = 0;
-    std::string rhyme = "no rhyme :(";
-    std::string phonRhyme;
+    int maxI = -1;
+    std::string wordPhon = ourMap.wordToPhon[word];
+    std::string rhymeWord;
+    std::string rhymePhon;
+    std::string rhyme = " ";
+    std::string phon = " ";
     for(auto it = ourMap.wordToInt.begin(); it != ourMap.wordToInt.end(); ++it)
     {
-        //std::cout << " " << it->first << std::endl;
-        std::string currentWord = it->first;
-        std::string phon2 = ourMap.phonetics(currentWord);
+        //std::cerr << wordPhon << " " << ourMap.phonetics(it->first) << std::endl;
+        rhymeWord = it->first;
+        //std::cerr << ourMap.wordToPhon[word] << " " << ourMap.wordToPhon[rhymeWord] << std::endl << std::endl;
+        rhymePhon = ourMap.wordToPhon[rhymeWord];
 
-        bool b = true;
+        int index = std::min(rhymePhon.length(), wordPhon.length());
+        if (index > 5) {index = 5;}
 
-        int I;
-        if(phon2.size()-1>=5 && phon.size()-1>=5)
+        while (index-1>0 && word.compare(rhymeWord) != 0)
         {
-            I = 5;
-        }
-        else
-        {
-            I = std::min(phon2.size()-1,phon.size()-1);
-        }
-
-        while(b && I>0)
-        {
-            if (phon2.size()>=I && phon.size()>=I && b)
+            if(index > maxI)
             {
-                if(phon.compare(phon2) != 0 && phon2.substr(phon2.size()-I,phon2.size()-1) == phon.substr(phon.size()-I,phon.size()-1))
+                //std::cout << "index > maxI: " << index << std::endl;
+                if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
                 {
-                    //std::cout << word << " " << word.size() << " " << word2 << " " << word2.size() << std::endl;
-                    rhyme = currentWord;
-                    phonRhyme = phon2;
-                    b = false;
+                    rhyme = rhymeWord;
+                    phon = rhymePhon;
+                    maxI = index;
+                    index = -1; //break while loop
                 }
             }
-            I--;
+            index--;
         }
-
     }
+    //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
 
-    //std::cout << "Rhyme: " << word << "  (phonetic: " << phon << ") --> " << rhyme << "  (phonetic: " << phonRhyme << ")" <<  std::endl;
 
     return rhyme;
 }
