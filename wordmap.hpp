@@ -92,7 +92,7 @@ public:
             return true;
         }
 
-        else ////std::cout << "Unable to open "<< in << std::endl;
+        else std::cout << "Unable to open "<< in << std::endl;
         return false;
 
     }
