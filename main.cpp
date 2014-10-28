@@ -1,5 +1,5 @@
 #include <iostream>
-#include "HMMv2.hpp"
+#include "model.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -30,7 +30,7 @@ int main()
         std::cerr << "Program interrupted." << std::endl;
         return 1;
     }
-    HMM model(maxIndex+1,maxIndex+1);
+    model model(maxIndex+1,maxIndex+1);
 
     std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
     /*
