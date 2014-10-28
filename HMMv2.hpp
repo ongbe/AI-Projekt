@@ -12,6 +12,7 @@ private:
     int N;// = 9; States
     int M;// = 9; Observations
     double** A;
+    int* p; //number of times each word occurs
 
 public:
     /**Contructor - generate matrices*/
@@ -21,6 +22,13 @@ public:
         M=m;
         std::cerr << "constructor called size: " << N << "x" << M << std::endl;
         A = initialize(N,N);
+        for(int i=0;i<N;++i)
+            for(int j=0;j<N;++j)
+                A[i][j] = 0;
+
+        p = (int*)calloc(N,sizeof(int));
+        for(int i=0;i<N;++i)
+            p[i] = 1;
     }
 
     /**Creates a nxm matrix*/
@@ -38,11 +46,6 @@ public:
     */
     void learn(std::vector<int> input)
     {
-        std::vector<double> p(N,1);
-        for(int i=0;i<N;++i)
-            for(int j=0;j<N;++j)
-                A[i][j] = 0;
-
         // Bigram
         for(int i=input.size()-2; i>=0; i--)
         {
@@ -81,38 +84,24 @@ public:
 
 
                 //trigram
-                /*
+
                 for(int k=0; k<N; k++)
                 {
-                    double temp = A[index][j]*A[j][k]*val[j]*val[k];
+                    double temp = A[index][j]*A[j][k];//*val[j];//*val[k];
                     //std::cerr << temp << std::endl;
                     if(temp>maximum)
                     {
                         tempIndex = j;
                         maximum = temp;
                     }
-                }*/
-
-                //quadgram
-                /*
-                std::cout << "ord: " << i << std::endl;
-                for(int k=0; k<N; k++)
-                {
-                    for(int l=0;l<N;++l)
-                    {§1§§§
-                        double temp = A[index][j]*A[j][k]*A[k][l]*val[j]*val[k]*val[l];
-                        if(temp>maximum)
-                        {
-                            tempIndex = j;
-                            maximum = temp;
-                        }
-                    }
-                }*/
-
-
+                }
             }
             index = tempIndex;
-            val[index]*=0.5;
+            //val[index] = ((val[index] *p[index])-1) / p[index];
+            double t = ((A[seq[i+1]][index] *p[index])-1) / p[index];
+            if(t>=0)
+                A[seq[i+1]][index] = t;
+            //val[index]*=0.5;
             seq[i] = index;
         }
         return seq;

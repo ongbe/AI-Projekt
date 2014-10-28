@@ -130,7 +130,7 @@ bool readFile(std::string in)
     /* import file */
     if (myfile.is_open())
     {
-        for (int i = 0; i<6638; ++i)
+        for (int i = 0; i<start; ++i)
             getline(myfile, line);
 
         std::string lowercase = "abcdefghijklmnopqrstuvwxyz";
