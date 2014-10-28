@@ -6,12 +6,27 @@
 #include <sstream>
 #include <limits>
 #include <fstream>
+
+struct wordObj
+{
+    int word;
+    int p1;
+    int p2;
+
+    wordObj(int index, int plus1, int plus2)
+    {
+        word = index;
+        p1 = plus1;
+        p2 = plus2;
+    }
+};
+
 class model
 {
 private:
     int N;// = 9; States
     int M;// = 9; Observations
-    double** A;
+
     int* p; //number of times each word occurs
 
 public:
@@ -21,10 +36,6 @@ public:
         N=n;
         M=m;
         std::cerr << "constructor called size: " << N << "x" << M << std::endl;
-        A = initialize(N,N);
-        for(int i=0;i<N;++i)
-            for(int j=0;j<N;++j)
-                A[i][j] = 0;
 
         p = (int*)calloc(N,sizeof(int));
         for(int i=0;i<N;++i)
@@ -70,38 +81,8 @@ public:
         seq[length-1] = index;
         for(int i=length-2;i>=0;--i)
         {
-            int tempIndex = 0;
-            double maximum = 0;
-            for(int j=0;j<N;++j)
-            {
-                //bigram
-                /*
-                if(A[index][j]>maximum)
-                {
-                    tempIndex = j;
-                    maximum = A[index][j]*val[j];
-                }*/
 
 
-                //trigram
-
-                for(int k=0; k<N; k++)
-                {
-                    double temp = A[index][j]*A[j][k];//*val[j];//*val[k];
-                    //std::cerr << temp << std::endl;
-                    if(temp>maximum)
-                    {
-                        tempIndex = j;
-                        maximum = temp;
-                    }
-                }
-            }
-            index = tempIndex;
-            //val[index] = ((val[index] *p[index])-1) / p[index];
-            double t = ((A[seq[i+1]][index] *p[seq[i+1]])-1) / p[seq[i+1]];
-            if(t>=0)
-                A[seq[i+1]][index] = t;
-            //val[index]*=0.5;
             seq[i] = index;
         }
         return seq;
