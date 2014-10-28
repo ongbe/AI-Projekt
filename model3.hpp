@@ -25,7 +25,6 @@ class model
 private:
     int N;// = 9;
     std::vector<wordObj>* words;
-    std::vector<int> seq;
     double*val;
 
 public:
@@ -55,7 +54,7 @@ public:
     */
     void learn(std::vector<int> input)
     {
-        seq = std::vector<int>(input.size());
+        std::vector<int> seq = std::vector<int>(input.size());
         int j = input.size()-1;
         int i=0;
         while(i<input.size())
@@ -82,7 +81,8 @@ public:
         sequence[length-1] = index;
         for(int i=length-2;i>=0;--i)
         {
-            index = trigram(index);
+            int* a = trigram(index);
+            index = a[0];
             sequence[i] = index;
             val[index] = val[index]*0.5;
             std::cout << index << std::endl;
@@ -91,8 +91,8 @@ public:
     }
 
     /** returns the next word*/
-    /*
-    int trigram(int index) //version 2 (med "fusk")
+
+    int* trigram(int index) //version 2 (med "fusk")
     {
         std::cerr << "trigram" << std::endl;
 
@@ -100,23 +100,98 @@ public:
         for(int i=0;i<N;++i)
             arr[N]=0;
 
-        int maximum = 0;
-        int newIndex = 0;
+        int n = 2;
+        int best[n][2];
+        for(int i=0;i<n;++i)
+        {
+            best[i][0]=0;
+            best[i][1]=0;
+        }
+
+        //int maximum = 0;
+        int minimum = 0;
+        int minIndex = 0;
         for(int i=0; i<words[index].size();++i)
         {
             //std::cout << arr[words[index][i].p1] << std::endl;
             arr[words[index][i].p1] += 1;
-            if(arr[words[index][i].p1] > maximum)
+            if(arr[words[index][i].p1] > minimum)
             {
-                maximum = arr[words[index][i].p1];
-                newIndex = i;
+                //replace the smallest value in best
+                best[minIndex][0] = words[index][i].p1;
+                best[minIndex][1] = arr[words[index][i].p1];
+
+                //find the smallest value in best, and update minimum and minIndex
+                int m = 0;
+                int in = 0;
+                for(int j=0;j<n;++j)
+                {
+                    if(best[j][1]<=m)
+                    {
+                        in = j;
+                        m = best[j][1];
+                    }
+                }
+                minimum = m;
+                minIndex = in;
             }
         }
-        std::cerr << maximum << "  " << newIndex << std::endl;
 
-        return newIndex;
+        //Check trigrams
+        double maximum1 = 0;
+        double maximum2 = 0;
+        int newIndex1 = 0;
+        int newIndex2 = 0;
+        for(int i=0;i<N;++i)
+        {
+            for(int j=0;j<N;++j)
+            {
+                float n1 = 1;
+                float n2 = 0;
+                //std:: cerr << words[index].size() << std::endl;
+                for(int k=0;k<n;++k)
+                {
+                    if(words[index][best[k][0]].p1 == i)
+                    {
+                        n1++;
+                        if(words[index][best[k][0]].p2 == j)
+                        {
+                            n2++;
+                        }
+                    }
+                }
+                float t = (n2/n1)*val[i]*val[j];
+                if(n2>1)
+                    //std::cerr << "n1 " << n1 << " n2 " << n2 << " t: " << t << " i: " << i << std::endl;
+                if(t>maximum1 && i!= index)
+                {
+                    if(maximum1>maximum2)
+                    {
+                        maximum2 = maximum1;
+                        newIndex2 = newIndex1;
+                    }
+                    maximum1 = t;
+                    newIndex1 = i;
+                }
+                else if(t>maximum2 && i!= index)
+                {
+                    maximum2 = t;
+                    newIndex2 = i;
+                }
+
+            }
+        }
+        //std::cerr << maximum << "  " << newIndex << std::endl;
+        //write best
+        //for(int i=0;i<n;++i)
+            //std::cerr << "best: " << best[i][0] << " " << best[i][1] << std::endl;;
+
+        int* r = (int*)calloc(2,sizeof(int));
+        r[0] = newIndex1;
+        r[1] = newIndex2;
+        return r;
     }
-    */
+    /*
     int trigram(int index)
     {
         std::cerr << "trigram" << std::endl;
@@ -152,7 +227,7 @@ public:
             }
         }
         return tempIndex;
-    }
+    }*/
 
     void print(double ** AA)
     {
