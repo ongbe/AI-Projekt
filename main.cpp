@@ -11,6 +11,7 @@
 
 /** Globals */
 std::string input;
+WordMap ourMap;
 
 /** Functions */
 std::string makeRhyme(bool, std::string);
@@ -19,7 +20,9 @@ int main()
 {
     /* Generate maps */
     std::vector<std::string> v = {"ShakespeareSonnets.txt", "Petrarca.txt"};
-    WordMap ourMap(v);
+
+    WordMap temp = WordMap(v);
+    ourMap = temp;
 
     if(!ourMap.ok)
     {

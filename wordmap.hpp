@@ -12,6 +12,8 @@ public:
     int maxIndex = -1;
     std::vector<int>sequence;
 
+    WordMap(){}
+
     WordMap(std::vector<std::string> in)
     {
         for (auto i : in)
