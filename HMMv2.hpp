@@ -98,7 +98,7 @@ public:
             }
             index = tempIndex;
             //val[index] = ((val[index] *p[index])-1) / p[index];
-            double t = ((A[seq[i+1]][index] *p[index])-1) / p[index];
+            double t = ((A[seq[i+1]][index] *p[seq[i+1]])-1) / p[seq[i+1]];
             if(t>=0)
                 A[seq[i+1]][index] = t;
             //val[index]*=0.5;
