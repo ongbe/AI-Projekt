@@ -1,6 +1,6 @@
 #include <iostream>
-#include "model.hpp"
-#include "wordmap.hpp"
+#include "modelv2.hpp"
+#include "wordmap2.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -15,6 +15,7 @@ WordMap ourMap;
 
 /** Functions */
 std::string makeRhyme(bool, std::string);
+std::string Rhyme(std::string word);
 
 int main()
 {
@@ -97,6 +98,57 @@ std::string makeRhyme(bool newRhyme, std::string in)
         return input;
     }
     else
-        input = in;
-        return in;
+//        input = in;
+//        return in;
+        std::string input = Rhyme(in);
+        return input;
+}
+
+std::string Rhyme(std::string word)
+{
+    std::string phon = ourMap.phonetics(word);
+    //std::cerr << "Word to rhyme on: " << phon << std::endl;
+
+    //Iterate through all the words
+    int maxMatch = 0;
+    std::string rhyme = "no rhyme :(";
+    std::string phonRhyme;
+    for(auto it = ourMap.wordToInt.begin(); it != ourMap.wordToInt.end(); ++it)
+    {
+        //std::cout << " " << it->first << std::endl;
+        std::string currentWord = it->first;
+        std::string phon2 = ourMap.phonetics(currentWord);
+
+        bool b = true;
+
+        int I;
+        if(phon2.size()-1>=5 && phon.size()-1>=5)
+        {
+            I = 5;
+        }
+        else
+        {
+            I = std::min(phon2.size()-1,phon.size()-1);
+        }
+
+        while(b && I>0)
+        {
+            if (phon2.size()>=I && phon.size()>=I && b)
+            {
+                if(phon.compare(phon2) != 0 && phon2.substr(phon2.size()-I,phon2.size()-1) == phon.substr(phon.size()-I,phon.size()-1))
+                {
+                    //std::cout << word << " " << word.size() << " " << word2 << " " << word2.size() << std::endl;
+                    rhyme = currentWord;
+                    phonRhyme = phon2;
+                    b = false;
+                }
+            }
+            I--;
+        }
+
+    }
+
+    std::cout << "Rhyme: " << word << "  (phonetic: " << phon << ") --> " << rhyme << "  (phonetic: " << phonRhyme << ")" <<  std::endl;
+
+    return " ";
 }
