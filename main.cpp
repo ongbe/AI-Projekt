@@ -1,6 +1,6 @@
 #include <iostream>
-#include "model.hpp"
-#include "wordmap.hpp"
+#include "model3.hpp"
+//#include "wordmap.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -32,7 +32,7 @@ int main()
     }
 
     /* Generate model */
-    model model(ourMap.maxIndex+1,ourMap.maxIndex+1);
+    model model(ourMap.maxIndex+1,ourMap.maxIndex+1, ourMap);
 
     std::cerr << "sequence.size(): "<< ourMap.sequence.size() << "  " << std::endl;
     /*

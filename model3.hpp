@@ -6,6 +6,7 @@
 #include <sstream>
 #include <limits>
 #include <fstream>
+#include "wordmap.hpp"
 
 struct wordObj
 {
@@ -20,16 +21,43 @@ struct wordObj
     int p2;
 };
 
+struct Tree
+{
+    Tree(int word1, Tree parent1)
+    {
+        word = word1;
+        parent = &parent1;
+        syllables = parent1.syllables;
+    }
+    Tree(int word1)
+    {
+        word = word1;
+    }
+    Tree(bool leaf1, Tree parent1)
+    {
+        leaf = leaf1;
+        parent = &parent1;
+        syllables = parent1.syllables;
+    }
+    int syllables = 0;
+    int word;
+    Tree* high; //best
+    Tree* low; //second best
+    Tree* parent;
+    bool leaf = false;
+};
+
 class model
 {
 private:
     int N;// = 9;
     std::vector<wordObj>* words;
     double*val;
+    WordMap ourMap;
 
 public:
     /**Contructor - generate matrices*/
-    model(int n, int m)
+    model(int n, int m, WordMap &ourMap1)
     {
         N=n;
         std::cerr << "constructor called size: " << N << std::endl;
@@ -37,6 +65,7 @@ public:
         val = (double*)calloc(N,sizeof(double));
         for(int i=0;i<N;++i)
             val[i] = 10;
+        ourMap = ourMap1;
     }
 
     /**Creates a nxm matrix*/
@@ -77,17 +106,50 @@ public:
     std::vector<int> Generate(int stopIndex, int length)
     {
         std::vector<int> sequence(length);
-        int index = stopIndex;
-        sequence[length-1] = index;
-        for(int i=length-2;i>=0;--i)
-        {
-            int* a = trigram(index);
-            index = a[0];
-            sequence[i] = index;
-            val[index] = val[index]*0.5;
-            std::cout << index << std::endl;
-        }
+        Tree tree(stopIndex);
+        generateTree(tree);
+
+//        int index = stopIndex;
+//        sequence[length-1] = index;
+//        for(int i=length-2;i>=0;--i)
+//        {
+//            int* a = trigram(index); //a[0] = best, a[1] = second best
+//            index = a[0];
+//            sequence[i] = index;
+//            val[index] = val[index]*0.5;
+//            std::cout << index << std::endl;
+//        }
         return sequence;
+    }
+
+    Tree* generateTree(Tree parent)
+    {
+        parent.syllables += ourMap.syllables(ourMap.intToWord[parent.word]);
+        std::cout << ourMap.intToWord[parent.word] << " " << parent.syllables << " ";
+        if(parent.syllables > 10)
+            return new Tree(true, parent);
+
+        int* a = trigram(parent.word);
+        parent.high = generateTree(Tree(a[0], parent));
+        parent.low = generateTree(Tree(a[1], parent));
+
+
+
+    }
+
+    /** Generate leaf (recursive)*/
+    Tree leaf(Tree &parent)
+    {
+        if (parent.leaf)
+        {
+            return parent;
+        }
+
+        int m1 = abs(10-parent.syllables);
+        leaf(parent.high);
+        int m2 = abs(10-leaf(parent.high).syllables);
+
+        //EJ FÄRDIGT!!
     }
 
     /** returns the next word*/
