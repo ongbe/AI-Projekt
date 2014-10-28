@@ -24,10 +24,36 @@ int main()
 std::string phonetics(std::string input)
 {
     std::string ph=input;
+    int l = ph.length();
+
+    //7
+    //'G' transforms to 'J' if before 'I', 'E', or 'Y', and it is not in 'GG'.
+    //Otherwise, 'G' transforms to 'K'.
+    for(int i=0; i<l ;++i)
+    {
+        if(ph[i] == 'g' && ph[i+1]=='g')
+        {
+            ph[i]='k';
+            ph.erase(i+1,1);
+            i--;
+            l--;
+        }
+        else if(ph[i] == 'g' && i+1<l && i-1>0)
+        {
+            if (ph[i+1] == 'i' || ph[i+1] == 'e' || ph[i+1] == 'y' && ph[i-1] != 'g')
+            {
+                ph[i] = 'j';
+            }
+            else
+            {
+                ph[i] = 'k';
+            }
+        }
+    }
+    std::cout << "7: " << ph << std::endl;
 
     //1
     //Drop duplicate adjacent letters, except for C
-    int l = ph.length();
     for(int i=0; i<l ;++i)
     {
         if(ph[i] == ph[i+1] && ph[i]!= 'c')
@@ -130,59 +156,32 @@ std::string phonetics(std::string input)
     }
     std::cout << "6: " << ph << std::endl;
 
-    //7 - EJ FÄRDIG
-    //'G' transforms to 'J' if before 'I', 'E', or 'Y', and it is not in 'GG'. <-----??????????????????????????????????
-    //Otherwise, 'G' transforms to 'K'.<---- fixa innan man tar bort dubbla!
-    for(int i=0; i<l ;++i)
-    {
-        if(ph[i] == 'g')
-        {
-            if ((ph[i+1] == 'i' || ph[i+1] == 'e' || ph[i+1] == 'y') && ph[i-1] != 'g')
-            {
-                ph[i] = 'j';
-            }
-            else
-            {
-                ph[i] = 'k';
-            }
-        }
-    }
-    std::cout << "7: " << ph << std::endl;
 
-    //8 - EJ FÄRDIG
+    //8
     //Drop 'H' if after vowel and not before a vowel
     for(int i=0; i<l ;++i)
     {
         if(ph[i] == 'h' )
         {
-            if (i+1<l && i-1>0)
+            if (i-1>0)
             {
-                std::string subPh = ph.substr(i-1, i+1);
-                if(subPh.find_first_of("aeiou") != std::string::npos && subPh.find_last_of("aeiou") != std::string::npos)
+                if(ph[i-1]=='a'||ph[i-1]=='e'||ph[i-1]=='i'||ph[i-1]=='o'||ph[i-1]=='u')//if after vowel
                 {
-                    ph.erase(i,1);
-                    i--;
-                    i--;
-                }
-            }
-            else if(i+1>l && i-1>0) //funkar inte :(
-            {
-                std::string subPh = ph.substr(i-1, i);
-                if(subPh.find_first_of("aeiou") != std::string::npos)
-                {
-                    ph.erase(i,1);
-                    i--;
-                    i--;
-                }
-            }
-            else if(i+1<l && i-1<0) //funkar inte :(
-            {
-                std::string subPh = ph.substr(i, i+1);
-                if(subPh.find_first_of("aeiou") != std::string::npos)
-                {
-                    ph.erase(i,1);
-                    i--;
-                    i--;
+                    if(i+1<l)
+                    {
+                        if(ph[i+1]!='a'&&ph[i+1]!='e'&&ph[i+1]!='i'&&ph[i+1]!='o'&&ph[i+1]!='u') // if not before vowel
+                        {
+                            ph.erase(i,1);
+                            i--;
+                            l--;
+                        }
+                    }
+                    else
+                    {
+                        ph.erase(i,1);
+                        i--;
+                        l--;
+                    }
                 }
             }
         }
@@ -191,27 +190,27 @@ std::string phonetics(std::string input)
 
     //9
     //'CK' transforms to 'K'
-    for(int i=0; i<l ;++i)
+    for(int i=0; i<l-1 ;++i)
     {
         if(ph[i] == 'c' && ph[i+1] == 'k')
         {
             ph.erase(i,1);
             i--;
-            i--;
+            l--;
         }
     }
     std::cout << "9: " << ph << std::endl;
 
     //10
     //'PH' transforms to 'F'
-    for(int i=0; i<l ;++i)
+    for(int i=0; i<l-1 ;++i)
     {
         if(ph[i] == 'p' && ph[i+1] == 'h')
         {
             ph[i] = 'f';
             ph.erase(i+1,1);
             i--;
-            i--;
+            l--;
         }
     }
     std::cout << "10: " << ph << std::endl;
@@ -229,11 +228,13 @@ std::string phonetics(std::string input)
 
     //12
     //'S' transforms to 'X' if followed by 'H', 'IO', or 'IA'
-    for(int i=0; i<l ;++i)
+    bool X = false;
+    for(int i=0; i<l-1 ;++i)
     {
-        if(ph[i]=='s' && ph[i+1]=='h' || ph[i]=='s' && ph[i+1]=='i' && ph[i+2]=='o' || ph[i]=='s' && ph[i+1]=='i' && ph[i+2]=='a')
+        if(ph[i]=='s' && ph[i+1]=='h' || i+2<l && ph[i]=='s' && ph[i+1]=='i' && ph[i+2]=='o' || i+2<l && ph[i]=='s' && ph[i+1]=='i' && ph[i+2]=='a')
         {
             ph[i] = 'x';
+            X = true;
         }
     }
     std::cout << "12: " << ph << std::endl;
@@ -243,22 +244,31 @@ std::string phonetics(std::string input)
     //'TH' transforms to '0'. Drop 'T' if followed by 'CH'.
     for(int i=0; i<l ;++i)
     {
-        if(ph[i]=='t' && ph[i+1]=='i' && ph[i+2]=='o' || ph[i]=='t' && ph[i+1]=='i' && ph[i+2]=='a')
+        if(i+2<l)
         {
-            ph[i] = 'x';
+            if(ph[i]=='t' && ph[i+1]=='i' && ph[i+2]=='o' || ph[i]=='t' && ph[i+1]=='i' && ph[i+2]=='a')
+            {
+                ph[i] = 'x';
+            }
         }
-        if(ph[i]=='t' && ph[i+1]=='h')
+        if(i+1<l)
         {
-            ph[i] = '0';
-            ph.erase(i+1,1);
-            i--;
-            i--;
+            if(ph[i]=='t' && ph[i+1]=='h')
+            {
+                ph[i] = '0';
+                ph.erase(i+1,1);
+                i--;
+                l--;
+            }
         }
-        if(ph[i]=='t' && ph[i+1]=='c' && ph[i+2]=='h')
+        if(i+2<l)
         {
-            ph.erase(i,1);
-            i--;
-            i--;
+            if(ph[i]=='t' && ph[i+1]=='c' && ph[i+2]=='h')
+            {
+                ph.erase(i,1);
+                i--;
+                l--;
+            }
         }
     }
     std::cout << "13: " << ph << std::endl;
@@ -274,24 +284,41 @@ std::string phonetics(std::string input)
     }
     std::cout << "14: " << ph << std::endl;
 
-    //15 - EJ FÄRDIG!!!
+    //15
     //'WH' transforms to 'W' if at the beginning
-    //Drop 'W' if not followed by a vowel <-- EJ GJORT
-    for(int i=0; i<l ;++i)
+    //Drop 'W' if not followed by a vowel
+    for(int i=0; i<l-1 ;++i)
     {
-        if(ph[i]=='w' && ph[i]=='h')
+        if(ph[i]=='w')
         {
-            ph.erase(i+1,1);
-            i--;
-            i--;
+            if(ph[i+1]=='h')
+            {
+                ph.erase(i+1,1);
+                i--;
+                i--;
+            }
         }
     }
+    for(int i=0; i<l-1 ;++i)
+    {
+        if(ph[i]=='w')
+        {
+            if(ph[i+1]!='a'&&ph[i+1]!='e'&&ph[i+1]!='i'&&ph[i+1]!='o'&&ph[i+1]!='u')
+            {
+                ph.erase(i,1);
+                i--;
+                l--;
+            }
+        }
+    }
+
+
     std::cout << "15: " << ph << std::endl;
 
-    //16 - EJ FÄRDIG!
+    //16
     //'X' transforms to 'S' if at the beginning
     //Otherwise, 'X' transforms to 'KS'.
-    if(ph[0]=='x')
+    if(ph[0]=='x' && X==false)
     {
         ph[0] = 's';
     }
@@ -299,16 +326,29 @@ std::string phonetics(std::string input)
     {
         if(i != 0 && ph[i]=='x')
         {
-            ph.insert(i,"ks");
-            //ph[i] = 'ks'; //hur lägger man till??
+            ph[i]='k';
+            ph.insert(i+1,"s");
             i++;
-            i++; //?????
+            l++;
         }
     }
     std::cout << "16: " << ph << std::endl;
 
-    //17 - EJ GJORT
+    //17
     //Drop 'Y' if not followed by a vowel
+    for(int i=0; i<l-1 ;++i)
+    {
+        if(ph[i]=='y')
+        {
+            if(ph[i+1]!='a'&&ph[i+1]!='e'&&ph[i+1]!='i'&&ph[i+1]!='o'&&ph[i+1]!='u')
+            {
+                ph.erase(i,1);
+                i--;
+                l--;
+            }
+        }
+    }
+    std::cout << "17: " << ph << std::endl;
 
     //18
     //'Z' transforms to 'S'
@@ -321,7 +361,7 @@ std::string phonetics(std::string input)
     }
     std::cout << "18: " << ph << std::endl;
 
-    //19 - EJ GJORT
+    //19 - VILL EJ HA
     //Drop all vowels unless it is the beginning
 
 
