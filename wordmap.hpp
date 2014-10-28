@@ -88,11 +88,11 @@ public:
                 }
             }
             myfile.close();
-            std::cout << "Reading " << in << " done" << std::endl;
+            //std::cout << "Reading " << in << " done" << std::endl;
             return true;
         }
 
-        else std::cout << "Unable to open "<< in << std::endl;
+        else ////std::cout << "Unable to open "<< in << std::endl;
         return false;
 
     }
@@ -110,8 +110,9 @@ public:
     /* Word to phonetics */
 std::string phonetics(std::string input)
 {
-    std::string ph=input;
+        std::string ph=input;
     int l = ph.length();
+    bool X = false;
 
     //7
     //'G' transforms to 'J' if before 'I', 'E', or 'Y', and it is not in 'GG'.
@@ -125,9 +126,9 @@ std::string phonetics(std::string input)
             i--;
             l--;
         }
-        else if(ph[i] == 'g' && i+1<l && i-1>0)
+        else if(ph[i] == 'g' && i+1<l)
         {
-            if (ph[i+1] == 'i' || ph[i+1] == 'e' || ph[i+1] == 'y' && ph[i-1] != 'g')
+            if (ph[i+1] == 'i' || ph[i+1] == 'e' || ph[i+1] == 'y')
             {
                 ph[i] = 'j';
             }
@@ -180,21 +181,30 @@ std::string phonetics(std::string input)
         if(ph[found+1] == 'i')
         {
             if(ph[found+2] == 'a')
+            {
                 ph[found] = 'x';
+                X = true;
+            }
             else
                 ph[found] = 's';
         }
-        else if(ph[found+1]=='h' && ph[found-1] != 's')
-            ph[found] = 'x';
-
+        else if(ph[found+1]=='h' && ph[found-1] == 's')
+        {
+            ph.erase(found-1,3);
+            ph.insert(found-1,"x");
+            X = true;
+        }
         else if(ph[found+1] == 'i' || ph[found+1] == 'e' || ph[found+1] == 'y')
+        {
             ph[found] = 's';
-
-        else
+        }
+        else if(ph[found+1] != 'k')
+        {
             ph[found] = 'k';
+        }
         found = input.find_first_of('c',found+1);
     }
-    //std::cout <<"4: " << ph <<std::endl;
+    ////std::cout <<"4: " << ph <<std::endl;
     l = ph.length();
 
     //5
@@ -214,7 +224,7 @@ std::string phonetics(std::string input)
             }
         }
     }
-    //std::cout << "5: " << ph << std::endl;
+    ////std::cout << "5: " << ph << std::endl;
 
 
     //6 - kanske FÄRDIG
@@ -250,7 +260,7 @@ std::string phonetics(std::string input)
     {
         if(ph[i] == 'h' )
         {
-            if (i-1>0)
+            if (i-1>=0)
             {
                 if(ph[i-1]=='a'||ph[i-1]=='e'||ph[i-1]=='i'||ph[i-1]=='o'||ph[i-1]=='u')//if after vowel
                 {
@@ -315,7 +325,6 @@ std::string phonetics(std::string input)
 
     //12
     //'S' transforms to 'X' if followed by 'H', 'IO', or 'IA'
-    bool X = false;
     for(int i=0; i<l-1 ;++i)
     {
         if(ph[i]=='s' && ph[i+1]=='h' || i+2<l && ph[i]=='s' && ph[i+1]=='i' && ph[i+2]=='o' || i+2<l && ph[i]=='s' && ph[i+1]=='i' && ph[i+2]=='a')
@@ -336,6 +345,7 @@ std::string phonetics(std::string input)
             if(ph[i]=='t' && ph[i+1]=='i' && ph[i+2]=='o' || ph[i]=='t' && ph[i+1]=='i' && ph[i+2]=='a')
             {
                 ph[i] = 'x';
+                X = true;
             }
         }
         if(i+1<l)
@@ -350,7 +360,7 @@ std::string phonetics(std::string input)
         }
         if(i+2<l)
         {
-            if(ph[i]=='t' && ph[i+1]=='c' && ph[i+2]=='h')
+            if(ph[i]=='t' && ph[i+1]=='c' && ph[i+2]=='h' || ph[i]=='t' && ph[i+1]=='x')
             {
                 ph.erase(i,1);
                 i--;
@@ -411,7 +421,7 @@ std::string phonetics(std::string input)
     }
     for(int i=0; i<l ;++i)
     {
-        if(i != 0 && ph[i]=='x')
+        if(i != 0 && ph[i]=='x' && X==false)
         {
             ph[i]='k';
             ph.insert(i+1,"s");
@@ -450,6 +460,8 @@ std::string phonetics(std::string input)
 
     //19 - VILL EJ HA
     //Drop all vowels unless it is the beginning
+
+
     return ph;
 }
 
