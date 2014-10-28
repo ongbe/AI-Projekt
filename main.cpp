@@ -1,6 +1,6 @@
 #include <iostream>
-#include "modelv2.hpp"
-#include "wordmap2.hpp"
+#include "model.hpp"
+#include "wordmap.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -98,9 +98,7 @@ std::string makeRhyme(bool newRhyme, std::string in)
         return input;
     }
     else
-//        input = in;
-//        return in;
-        std::string input = Rhyme(in);
+        input = Rhyme(in);
         return input;
 }
 
@@ -148,7 +146,7 @@ std::string Rhyme(std::string word)
 
     }
 
-    std::cout << "Rhyme: " << word << "  (phonetic: " << phon << ") --> " << rhyme << "  (phonetic: " << phonRhyme << ")" <<  std::endl;
+    //std::cout << "Rhyme: " << word << "  (phonetic: " << phon << ") --> " << rhyme << "  (phonetic: " << phonRhyme << ")" <<  std::endl;
 
-    return " ";
+    return rhyme;
 }
