@@ -161,7 +161,7 @@ public:
                     }
                 }
                 float t = (n2/n1)*val[i]*val[j];
-                if(n2>1)
+                //if(n2>1)
                     //std::cerr << "n1 " << n1 << " n2 " << n2 << " t: " << t << " i: " << i << std::endl;
                 if(t>maximum1 && i!= index)
                 {
