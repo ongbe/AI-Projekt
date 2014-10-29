@@ -35,7 +35,7 @@ struct Tree
     }
     Tree(bool leaf1, Tree parent1)
     {
-        leaf = leaf1;
+        isLeaf = leaf1;
         parent = &parent1;
         syllables = parent1.syllables;
     }
@@ -44,7 +44,7 @@ struct Tree
     Tree* high; //best
     Tree* low; //second best
     Tree* parent;
-    bool leaf = false;
+    bool isLeaf = false;
 };
 
 class model
@@ -106,8 +106,15 @@ public:
     std::vector<int> Generate(int stopIndex, int length)
     {
         std::vector<int> sequence(length);
-        Tree tree(stopIndex);
-        generateTree(tree);
+        //Tree tree(stopIndex);
+        Tree* tree = generateTree(Tree(stopIndex));
+
+        std::cout << "\nGenerate tree done" << std::endl;
+
+        Tree* goodNode = leaf(tree);
+
+        //find path back to tree
+        std::cout << "leta mening" << std::endl;
 
 //        int index = stopIndex;
 //        sequence[length-1] = index;
@@ -138,16 +145,31 @@ public:
     }
 
     /** Generate leaf (recursive)*/
-    Tree leaf(Tree &parent)
+    Tree* leaf(Tree* parent)
     {
-        if (parent.leaf)
+        std::cout << "leaf called" << std::endl;
+        if (parent -> isLeaf)
         {
             return parent;
         }
 
-        int m1 = abs(10-parent.syllables);
-        leaf(parent.high);
-        int m2 = abs(10-leaf(parent.high).syllables);
+        Tree* t1 = leaf(parent -> high);
+        Tree* t2 = leaf(parent -> low);
+
+        int m0 = abs(10-parent ->syllables);
+        int m1 = abs(10-t1 -> syllables);
+        int m2 = abs(10-t2 -> syllables);
+
+        std::cout << "m0 " << m0 << " m1 " << m1 << " m2 " << m2 << std::endl;
+
+        if(m0 >= m1 && m0 >= m2)
+            return parent;
+        if(m1 >= m0 >= m2)
+            return t1;
+        if(m2 >= m0 && m2 >= m1)
+            return t2;
+
+
 
         //EJ FÄRDIGT!!
     }
@@ -200,6 +222,7 @@ public:
         }
 
         //Check trigrams
+        /*
         double maximum1 = 0;
         double maximum2 = 0;
         int newIndex1 = 0;
@@ -247,10 +270,10 @@ public:
         //write best
         //for(int i=0;i<n;++i)
             //std::cerr << "best: " << best[i][0] << " " << best[i][1] << std::endl;;
-
+        */
         int* r = (int*)calloc(2,sizeof(int));
-        r[0] = newIndex1;
-        r[1] = newIndex2;
+        r[0] = best[0][0];//newIndex1;
+        r[1] = best[1][0];//newIndex2;
         return r;
     }
     /*
