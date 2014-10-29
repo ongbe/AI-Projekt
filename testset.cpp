@@ -2,6 +2,7 @@
 #include<iostream>
 
 std::unordered_map<int*, double> bigrams;
+std::unordered_map<int, double> words;
 
 void increment_all(int* start, int* stop)
 {
@@ -22,6 +23,9 @@ int main()
 
 int meh[5] = {1,2,3,4,5};
         int * current = meh;
+        words[3]++;
+    int lastW = 3;
+    std::cout<< "THIS: " << (int)lastW << words[3]++ <<words[lastW] << std::endl;
     for (auto i : {1, 2, 3, 4, 5})
     {
         int temp[2] {*(current++), 5};
