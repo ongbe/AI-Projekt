@@ -135,6 +135,12 @@ public:
         //Otherwise, 'G' transforms to 'K'.
         for(int i=0; i<l ;++i)
         {
+            if(ph[i] == '\'') // Remove apostrophe
+            {
+                ph.erase(i,1);
+                i--;
+                l--;
+            }
             if(ph[i] == 'g' && ph[i+1]=='g')
             {
                 ph[i]='k';
