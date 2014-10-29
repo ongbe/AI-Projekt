@@ -92,10 +92,17 @@ std::string makeRhyme(bool newRhyme, std::string in)
 {
     if (newRhyme)
     {
-        //New rhyme
-        std::cout<< "Word: ";
-        std::cin >> input;
-        return input;
+        bool b = true;
+        while(b)
+        {
+            //New rhyme
+            std::cout<< "Word: ";
+            std::cin >> input;
+            if(ourMap.wordToInt.find(input) != ourMap.wordToInt.end())//if word exists - return
+            {
+                return input;
+            }
+        }
     }
     else
         input = Rhyme(in);
