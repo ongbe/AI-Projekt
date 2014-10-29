@@ -72,7 +72,7 @@ public:
             //std::string temp1 = ""; temp1.append(in[i]); temp1.append(" "); temp1.append(in[i-1]);
 
             std::string temp1 = toString1(in[i],in[i-1]);
-            std::string temp2 = toString2(in[i],in[i-1], in[i-1]);
+            std::string temp2 = toString2(in[i],in[i-1], in[i-2]);
 
             //std::string temp2 = ""+in[i]+" "+in[i-1]+" "+in[i-2];
             //int* tempBi =  temp1.data();
@@ -86,11 +86,15 @@ public:
     /**Generate sequence*/
     std::vector<int> Generate(int lastWrd, int length)
     {
-        //std::cout << "Generation: " << lastWrd << std::endl;
+        //std::cout << "1Generation: " << lastWrd << std::endl;
         std::vector<int> out;
 
-
-
+        //If "superlong" word LastWord (just in case)
+        if (length - oneMap.syllables(oneMap.intToWord[lastWrd]) < 0)
+        {
+            out.push_back(lastWrd);
+            return out;
+        }
 
         //Consider
         int bestWrd1;
@@ -103,9 +107,11 @@ public:
             //int* tempBi =  temp1.data();
             if (mapBigrams.find(temp1) != mapBigrams.end())
             {
-                std::cout << "ok\t" << temp1 << "\t" << mapBigrams[temp1] << std::endl;
+                //std::cout << "ok\t" << temp1 << "\t" << mapBigrams[temp1] << std::endl;
                 tempVal1 = (double)(1.+mapBigrams[temp1]);
             }
+            else
+                tempVal1 = 0;
             if (tempVal1/tempVal2 > maxFreq)
             {
                 bestWrd1 = i;
@@ -113,9 +119,14 @@ public:
             }
         }
 
-            out = GenerateReq(lastWrd, bestWrd1, length-1);
-            out.push_back(lastWrd);
-            return out;
+        //Best word found! Generate the rest recursively.
+        out = GenerateReq(lastWrd, bestWrd1, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
+        out.push_back(lastWrd);
+        int summa = 0;
+        for(int i = 0; i < out.size(); i++)
+            summa += oneMap.syllables(oneMap.intToWord[out[i]]);
+        std::cout << summa << "\t";
+        return out;
     }
 
     std::vector<int> GenerateReq(int lastWrd, int bestWrd, int length)
@@ -123,30 +134,32 @@ public:
         //std::cout << "Generation: " << lastWrd << std::endl;
         std::vector<int> out;
 
-        //Break condition
-        if (length == 1)
+        //Break condition - out of syllables
+        if (length - oneMap.syllables(oneMap.intToWord[bestWrd]) < 0)
         {
-            out.push_back(lastWrd);
+            out.push_back(bestWrd);
             return out;
         }
+
         //Consider
-        int bestWrd2;
+        int bestWrd2 = 0;
         double maxFreq = 0, tempVal1, tempVal2;
-        std::vector<int> temp1 = {lastWrd, bestWrd};
-        int* tempBi =  temp1.data();
+        //std::cout << lastWrd << " " << bestWrd << std::endl;
+        std::string temp1 = toString1(lastWrd, bestWrd);
+        tempVal2 = mapBigrams[temp1];
         for(int j = 0; j < N; j++)
         {
-            int bestWrd;
-            double maxFreq = 0, tempVal1, tempVal2;
             //Count occurrences
             //std::vector<int> temp2 = {lastWrd, bestWrd1, j};
             std::string temp2 = toString2(lastWrd,bestWrd,j);
             //int* tempTri =  temp2.data();
-            if (trigrams.find(temp2) != trigrams.end())
+            if ((trigrams.find(temp2) != trigrams.end()) && length - oneMap.syllables(oneMap.intToWord[j]))
             {
-                //std::cout << "YES\t" << j << "\t" << mapTrigrams[tempTri] << std::endl;
-                tempVal1 = (double)(1.+mapTrigrams[temp2]--);
+                //std::cout << "YES\t" << j << "\t" << mapTrigrams[temp2] << std::endl;
+                tempVal1 = mapTrigrams[temp2];
             }
+            else
+                tempVal1 = 0;
 
             //Check if max
             //std::cout << tempVal1 << "\t" << tempVal2 << std::endl;
@@ -159,8 +172,8 @@ public:
             }
         }
         //Best word found! Generate next word
-        out = GenerateReq(bestWrd, bestWrd2, length-1);
-        out.push_back(lastWrd);
+        out = GenerateReq(bestWrd, bestWrd2, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
+        out.push_back(bestWrd);
         return out;
     }
 };

@@ -1,6 +1,5 @@
 #include <iostream>
-#include "model2.hpp"
-//#include "wordmap.hpp"
+#include "model5.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -14,59 +13,8 @@ std::string input;
 WordMap ourMap;
 
 /** Functions */
-std::string makeRhyme(bool newRhyme, std::string in)
-{
-    if (newRhyme)
-    {
-        //New rhyme
-        std::cout<< "Word: ";
-        std::cin >> input;
-        return input;
-    }
-    else
-        input = Rhyme(in);
-        return input;
-}
-
-std::string Rhyme(std::string word)
-{
-    int maxI = -1;
-    std::string wordPhon = ourMap.wordToPhon[word];
-    std::string rhymeWord;
-    std::string rhymePhon;
-    std::string rhyme = " ";
-    std::string phon = " ";
-    for(auto it = ourMap.wordToInt.begin(); it != ourMap.wordToInt.end(); ++it)
-    {
-        //std::cerr << wordPhon << " " << ourMap.phonetics(it->first) << std::endl;
-        rhymeWord = it->first;
-        //std::cerr << ourMap.wordToPhon[word] << " " << ourMap.wordToPhon[rhymeWord] << std::endl << std::endl;
-        rhymePhon = ourMap.wordToPhon[rhymeWord];
-
-        int index = std::min(rhymePhon.length(), wordPhon.length());
-        if (index > 5) {index = 5;}
-
-        while (index-1>0 && word.compare(rhymeWord) != 0)
-        {
-            if(index > maxI)
-            {
-                //std::cout << "index > maxI: " << index << std::endl;
-                if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
-                {
-                    rhyme = rhymeWord;
-                    phon = rhymePhon;
-                    maxI = index;
-                    index = -1; //break while loop
-                }
-            }
-            index--;
-        }
-    }
-    //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
-
-
-    return rhyme;
-}
+std::string makeRhyme(bool, std::string);
+std::string Rhyme(std::string);
 
 
 int main()
@@ -128,7 +76,7 @@ int main()
 
         int in = ourMap.wordToInt[input];
 
-        std::vector<int> ny = model.Generate(in,10, true);
+        std::vector<int> ny = model.Generate(in,10);
 
         for(int i=0;i<(int)ny.size();++i)
             std::cout << ourMap.intToWord[ny[i]] << " ";
@@ -140,4 +88,62 @@ int main()
 
     //model.print();
 	return 0;
+}
+
+std::string makeRhyme(bool newRhyme, std::string in)
+{
+    if (newRhyme)
+    {
+        //New rhyme
+        input = -1000;
+        while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
+        {
+            //New rhyme
+            std::cout<< "Word: ";
+            std::cin >> input;
+        }
+    }
+    else
+        input = Rhyme(in);
+    return input;
+}
+
+std::string Rhyme(std::string word)
+{
+    int maxI = -1;
+    std::string wordPhon = ourMap.wordToPhon[word];
+    std::string rhymeWord;
+    std::string rhymePhon;
+    std::string rhyme = " ";
+    std::string phon = " ";
+    for(auto it = ourMap.wordToInt.begin(); it != ourMap.wordToInt.end(); ++it)
+    {
+        //std::cerr << wordPhon << " " << ourMap.phonetics(it->first) << std::endl;
+        rhymeWord = it->first;
+        //std::cerr << ourMap.wordToPhon[word] << " " << ourMap.wordToPhon[rhymeWord] << std::endl << std::endl;
+        rhymePhon = ourMap.wordToPhon[rhymeWord];
+
+        int index = std::min(rhymePhon.length(), wordPhon.length());
+        if (index > 5) {index = 5;}
+
+        while (index-1>0 && word.compare(rhymeWord) != 0)
+        {
+            if(index > maxI)
+            {
+                //std::cout << "index > maxI: " << index << std::endl;
+                if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
+                {
+                    rhyme = rhymeWord;
+                    phon = rhymePhon;
+                    maxI = index;
+                    index = -1; //break while loop
+                }
+            }
+            index--;
+        }
+    }
+    //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
+
+
+    return rhyme;
 }
