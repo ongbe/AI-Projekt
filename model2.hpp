@@ -7,25 +7,27 @@
 #include <limits>
 #include <fstream>
 #include <unordered_map>
-//#import <utility>
+#include <unordered_set>
+//#include <hash>
 
 class myHash{
 public:
     size_t operator()(const std::vector<int> &k) const{
-        if (k.size() == 2)
-            return k[0] * 100 + k[1]; //CAUTION: Do NOT use if vector.size()
-        if (k.size() == 3)
-            return k[0] * 50 + k[1] + k[2] * 13;
+        int arr[k.size()];
+        std::copy(k.begin(), k.end(), arr);
+        std::hash<int*> hasher;
+        return hasher(arr);
     }
 };
 
 struct myEquals : std::binary_function<const std::vector<int>&, const std::vector<int>&, bool> {
-    result_type operator()( first_argument_type lhs, second_argument_type rhs ) const
+    result_type operator()( first_argument_type first, second_argument_type second ) const
     {
-        if (lhs.size() == 2 && rhs.size() == 2)
-            return (lhs[0] == rhs[0] && lhs[1] == rhs[1]);
-        if (lhs.size() == 3 && rhs.size() == 3)
-            return (lhs[0] == rhs[0] && lhs[1] == rhs[1] && lhs[2] == rhs[2]);
+        int lhs[first.size()];
+        std::copy(first.begin(), first.end(), lhs);
+        int rhs[second.size()];
+        std::copy(second.begin(), second.end(), rhs);
+        return (lhs == rhs);
     }
 };
 
@@ -36,8 +38,9 @@ private:
     int M;// = 9; Observations
     //double** A;
     //int* p; //number of times each word occurs
-    std::unordered_map<std::vector<int>, double, myHash, myEquals> bigrams;
-    std::unordered_map<std::vector<int>, double, myHash, myEquals> trigrams;
+    std::unordered_map<std::vector<int>, double, myHash, myEquals> mapBigrams;
+    std::unordered_map<std::vector<int>, double, myHash, myEquals> mapTrigrams;
+    std::unordered_set<std::vector<int>, myHash, myEquals> trigrams;
 
 public:
     /**Contructor - generate matrices*/
@@ -70,43 +73,13 @@ public:
         for (int i = input.size()-1; i > 1 ; i--)
         {
             std::vector<int> tempBi = {input[i],input[i-1]}, tempTri = {input[i],input[i-1],input[i-2]};
-            bigrams[tempBi]++; //If not previously existing (new bigram), automatically creates a node with value 0+1=1. Else, add 1 to value (count).
-            trigrams[tempTri]++;
+            mapBigrams[tempBi]++; //If not previously existing (new bigram), automatically creates a node with value 0+1=1. Else, add 1 to value (count).
+            mapTrigrams[tempTri]++;
+            trigrams.insert(tempTri);
         }
     }
 
     /**Generate sequence*/
-    /*std::vector<int> Generate(int lastWrd, int length)
-    {
-        std::cout << "Generation" << std::endl;
-        std::vector<int> out;
-        int bestWrd;
-        double maxFreq = 0, tempVal1, tempVal2;
-        for(int i = 0; i < N; i++)
-        {
-            for(int j = 0; j < N; j++)
-            {
-                //Count occurrences
-                int tempTri[3] = {lastWrd, i, j}, tempBi[2] = {i,j};
-                if (trigrams.find(tempTri) == trigrams.end()) tempVal1 = 1;
-                else tempVal1 = trigrams[tempTri]+1;
-                if (bigrams.find(tempBi) == bigrams.end()) tempVal2 = 1;
-                else tempVal2 = bigrams[tempBi]+1;
-
-                //Check if max
-                if (tempVal1/tempVal2 > maxFreq)
-                {
-                    bestWrd = i;
-                    maxFreq = tempVal1/tempVal2;
-                }
-            }
-        }
-        //Best word found! Generate next word
-        if (length >= 1)
-            out = GenerateReq(bestWrd, length-1);
-        out.push_back(lastWrd);
-        return out;
-    }*/
     std::vector<int> Generate(int lastWrd, int length)
     {
         std::cout << "Generation: " << lastWrd << std::endl;
@@ -122,20 +95,20 @@ public:
         //Consider
         int bestWrd;
         double maxFreq = 0, tempVal1, tempVal2;
-        for(int i = 0; i < N; i++)
+        for(int i = 0; i < mapBigrams.size(); i++)
         {
             std::vector<int> tempBi = {lastWrd,i};
-            if (bigrams.find(tempBi) == bigrams.end())
+            if (mapBigrams.find(tempBi) == mapBigrams.end())
             {
                 tempVal2 = 1.;
             }
             else
             {
-                std::cout << "ok\t" << i << "\t" << bigrams[tempBi] << std::endl;
-                tempVal2 = (double)(1.+bigrams[tempBi]);
+                std::cout << "ok\t" << i << "\t" << mapBigrams[tempBi] << std::endl;
+                tempVal2 = (double)(1.+mapBigrams[tempBi]);
             }
 
-            for(int j = 0; j < N; j++)
+            for(int j = 0; j < trigrams.size(); j++)
             {
                 //Count occurrences
                 std::vector<int> tempTri = {lastWrd, i, j};
@@ -145,8 +118,8 @@ public:
                 }
                 else
                 {
-                    std::cout << "YES\t" << j << "\t" << trigrams[tempTri] << std::endl;
-                    tempVal1 = (double)(1.+trigrams[tempTri]--);
+                    std::cout << "YES\t" << j << "\t" << mapTrigrams[tempTri] << std::endl;
+                    tempVal1 = (double)(1.+mapTrigrams[tempTri]--);
                 }
 
                 //Check if max
