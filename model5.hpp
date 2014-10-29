@@ -156,7 +156,7 @@ public:
             if ((trigrams.find(temp2) != trigrams.end()) && length - oneMap.syllables(oneMap.intToWord[j]))
             {
                 //std::cout << "YES\t" << j << "\t" << mapTrigrams[temp2] << std::endl;
-                tempVal1 = mapTrigrams[temp2]--;
+                tempVal1 = mapTrigrams[temp2];
             }
             else
                 tempVal1 = 0;
