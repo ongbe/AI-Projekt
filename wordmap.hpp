@@ -111,11 +111,11 @@ public:
     int syllables(std::string input)
     {
         int s = 0;
-        std::size_t found = input.find_first_of("aeiou");
+        std::size_t found = input.find_first_of("aeiouy");
         std::size_t newfound;
         while (found!=std::string::npos)
         {
-            newfound = input.find_first_of("aeiou",found+1);
+            newfound = input.find_first_of("aeiouy",found+1);
             if(newfound != found+1)
                 s++;
             found = newfound;
@@ -455,18 +455,18 @@ public:
 
         //17
         //Drop 'Y' if not followed by a vowel
-        for(int i=0; i<l-1 ;++i)
-        {
-            if(ph[i]=='y')
-            {
-                if(ph[i+1]!='a'&&ph[i+1]!='e'&&ph[i+1]!='i'&&ph[i+1]!='o'&&ph[i+1]!='u')
-                {
-                    ph.erase(i,1);
-                    i--;
-                    l--;
-                }
-            }
-        }
+//        for(int i=0; i<l-1 ;++i)
+//        {
+//            if(ph[i]=='y')
+//            {
+//                if(ph[i+1]!='a'&&ph[i+1]!='e'&&ph[i+1]!='i'&&ph[i+1]!='o'&&ph[i+1]!='u')
+//                {
+//                    ph.erase(i,1);
+//                    i--;
+//                    l--;
+//                }
+//            }
+//        }
         //std::cout << "17: " << ph << std::endl;
 
         //18
