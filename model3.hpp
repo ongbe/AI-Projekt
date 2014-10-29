@@ -6,6 +6,7 @@
 #include <sstream>
 #include <limits>
 #include <fstream>
+#include <queue>
 #include "wordmap.hpp"
 
 struct wordObj
@@ -26,19 +27,30 @@ struct Tree
     Tree(int word1, Tree parent1)
     {
         word = word1;
+        //seq = parent -> seq;
+        //seq.push_back(word1);
         parent = &parent1;
         syllables = parent1.syllables;
+        depth = parent1.depth+1;
     }
+
     Tree(int word1)
     {
         word = word1;
+        //seq.push_back(word);
     }
+
     Tree(bool leaf1, Tree parent1)
     {
         isLeaf = leaf1;
         parent = &parent1;
         syllables = parent1.syllables;
+        depth = parent1.depth+1;
+        //seq = parent -> seq;
     }
+
+    //std::vector<int>seq;
+    int depth = 1;
     int syllables = 0;
     int word;
     Tree* high; //best
@@ -103,62 +115,97 @@ public:
     }
 
     /**Generate sequence*/
-    std::vector<int> Generate(int stopIndex, int length)
+    std::vector<int> Generate(int stopIndex, int syl)
     {
-        std::vector<int> sequence(length);
-        //Tree tree(stopIndex);
-        Tree* tree = generateTree(Tree(stopIndex));
+        Tree tree(stopIndex); //rot
+        tree.syllables = ourMap.syllables(ourMap.intToWord[tree.word]);
 
-        std::cout << "\nGenerate tree done" << std::endl;
+        std::queue<Tree> Q;
+        Q.push(tree);
+        bool go = true;
+        Tree temp = Q.front();
+        while(!Q.empty() && go)
+        {
+            Tree temp = Q.front();
+            Q.pop();
 
-        Tree* goodNode = leaf(tree);
+            std::cout << "Syllables " << temp.syllables << " Word: " << ourMap.intToWord[temp.word];
+            std::cout << " parentWord: " << ourMap.intToWord[temp.parent -> word];
+            std::cout << " parentParentWord: " << ourMap.intToWord[temp.parent -> parent -> word] << std::endl;
+
+            if(temp.syllables>= syl)
+            {
+                go = false;
+                std::cout << "break!" << std::endl;
+                break;
+            }
+
+            //generate new nodes;
+            int* a = trigram(temp.word);
+
+            Tree right = Tree(a[0],temp);
+            right.syllables = temp.syllables + ourMap.syllables(ourMap.intToWord[right.word]);
+
+            //Tree left = Tree(a[1],temp);
+            //left.syllables = temp.syllables + ourMap.syllables(ourMap.intToWord[left.word]);
+
+            Q.push(right);
+            //Q.push(left);
+        }
 
         //find path back to tree
-        std::cout << "leta mening" << std::endl;
+        std::cout << "Leta mening, length " << temp.depth << std::endl;
 
-//        int index = stopIndex;
-//        sequence[length-1] = index;
-//        for(int i=length-2;i>=0;--i)
-//        {
-//            int* a = trigram(index); //a[0] = best, a[1] = second best
-//            index = a[0];
-//            sequence[i] = index;
-//            val[index] = val[index]*0.5;
-//            std::cout << index << std::endl;
-//        }
+        int length = temp.depth;
+        std::vector<int>sequence(length);
+
+        for(int i=0;i<length;++i)
+        {
+            //std::cout << "word: " << ourMap.intToWord[goodNode -> word];
+            //std::cout << " parentWord: " << ourMap.intToWord[goodNode -> parent -> word] << std::endl;
+
+            sequence[i] = temp.word;//goodNode -> word;
+            temp = *temp.parent; //goodNode -> parent;
+        }
+
         return sequence;
     }
 
-    Tree* generateTree(Tree parent)
+    /*
+    void generateTree(Tree &parent,int depth)
     {
-        parent.syllables += ourMap.syllables(ourMap.intToWord[parent.word]);
-        std::cout << ourMap.intToWord[parent.word] << " " << parent.syllables << " ";
         if(parent.syllables > 10)
-            return new Tree(true, parent);
+            return;
+
+        parent.syllables += ourMap.syllables(ourMap.intToWord[parent.word]);
+        std::cout << ourMap.intToWord[parent.word] << " " << parent.syllables << " Depth: "  << depth << std::endl;
+        if(parent.syllables > 10)
+            return;
 
         int* a = trigram(parent.word);
-        parent.high = generateTree(Tree(a[0], parent));
-        parent.low = generateTree(Tree(a[1], parent));
-
-
-
+        generateTree(Tree(a[0], parent),depth+1);
+        generateTree(Tree(a[1], parent),depth+1);
     }
+    */
 
     /** Generate leaf (recursive)*/
-    Tree* leaf(Tree* parent)
+    /*
+    Tree leaf(Tree &parent)
     {
-        std::cout << "leaf called" << std::endl;
-        if (parent -> isLeaf)
-        {
-            return parent;
-        }
+        std::cout << "leaf called " << std::endl;
+        //if (parent.isLeaf)
+        //{
+            //return parent;
+        //}
 
-        Tree* t1 = leaf(parent -> high);
-        Tree* t2 = leaf(parent -> low);
+        std::cout << "efter if" << std::endl;
 
-        int m0 = abs(10-parent ->syllables);
-        int m1 = abs(10-t1 -> syllables);
-        int m2 = abs(10-t2 -> syllables);
+        Tree t1 = leaf(*parent.high);
+        Tree t2 = leaf(*parent.low);
+
+        int m0 = abs(10-parent.syllables);
+        int m1 = abs(10-t1.syllables);
+        int m2 = abs(10-t2.syllables);
 
         std::cout << "m0 " << m0 << " m1 " << m1 << " m2 " << m2 << std::endl;
 
@@ -171,9 +218,10 @@ public:
 
 
 
+
         //EJ FÄRDIGT!!
     }
-
+    */
     /** returns the next word*/
 
     int* trigram(int index) //version 2 (med "fusk")
