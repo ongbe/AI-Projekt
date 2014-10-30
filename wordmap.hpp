@@ -30,15 +30,34 @@ public:
         std::string line, endLine;
         std::ifstream myfile (in);
         int start;
-        if (in == "Petrarca.txt")
+        if(in == "Petrarca.txt")
         {
             start = 6638;
             endLine = "INDEX.";
         }
-        else
+        else if(in == "Shakespeare.txt")
         {
             start = 288;
             endLine = "End of The Project Gutenberg Etext of Shakespeare's Sonnets";
+        }
+        /*else if(in == "FernandoAntonio.txt")
+        {
+            start = 43;
+            endLine = "***END OF THE PROJECT GUTENBERG EBOOK 35 SONNETS***";
+        }
+        else if(in == "HelenHayWhitney.txt")
+        {
+            start = 153;
+            endLine = "SONGS";
+        }
+        else if(in == "ElizabethBarrettBrowning.txt")
+        {
+            start = 84;
+            endLine = "*** END OF THIS PROJECT GUTENBERG EBOOK SONNETS FROM THE PORTUGUESE ***";
+        }*/
+        else
+        {
+            std::cerr << "No file called" << std::endl;
         }
 
         /* import file */
