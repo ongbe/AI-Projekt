@@ -22,6 +22,7 @@ private:
     std::unordered_map<std::string, double> mapBigrams;
     std::unordered_map<std::string, double> mapTrigrams;
     std::unordered_set<std::string> trigrams;
+    std::vector<int> allOk;
     WordMap oneMap;
 
 public:
@@ -108,15 +109,26 @@ public:
             if (mapBigrams.find(temp1) != mapBigrams.end())
             {
                 //std::cout << "ok\t" << temp1 << "\t" << mapBigrams[temp1] << std::endl;
-                tempVal1 = (double)(1.+mapBigrams[temp1]);
+                tempVal1 = mapBigrams[temp1];
             }
             else
                 tempVal1 = 0;
-            if (tempVal1/tempVal2 > maxFreq)
+
+            tempVal1 /= tempVal2;
+            if((fabs(tempVal1 - maxFreq) < 1e-5) && tempVal1 - 1e-5 < 0)
             {
-                bestWrd1 = i;
-                maxFreq = tempVal1/tempVal2;
+                allOk.push_back(i);
             }
+            else if (tempVal1 > maxFreq)
+            {
+                allOk.clear();
+                bestWrd1 = i;
+                maxFreq = tempVal1;
+            }
+        }
+        if(!allOk.empty())
+        {
+            bestWrd1 = allOk[rand() % allOk.size()];
         }
 
         //Best word found! Generate the rest recursively.
@@ -125,7 +137,7 @@ public:
         int summa = 0;
         for(int i = 0; i < out.size(); i++)
             summa += oneMap.syllables(oneMap.intToWord[out[i]]);
-        std::cout << summa << "\t";
+        std::cout << "(" << summa << ")-";
         return out;
     }
 
@@ -165,11 +177,21 @@ public:
             //std::cout << tempVal1 << "\t" << tempVal2 << std::endl;
             //std::cout << tempVal1/tempVal2 << std::endl;
 
-            if (tempVal1/tempVal2 > maxFreq)
+            tempVal1 /= tempVal2;
+            if((fabs(tempVal1 - maxFreq) < 1e-5) && tempVal1 - 1e-5 < 0)
             {
-                bestWrd2 = j;
-                maxFreq = tempVal1/tempVal2;
+                allOk.push_back(j);
             }
+            else if (tempVal1 > maxFreq)
+            {
+                allOk.clear();
+                bestWrd2 = j;
+                maxFreq = tempVal1;
+            }
+        }
+        if(!allOk.empty())
+        {
+            bestWrd2 = allOk[rand() % allOk.size()];
         }
         //Best word found! Generate next word
         out = GenerateReq(bestWrd, bestWrd2, length-oneMap.syllables(oneMap.intToWord[lastWrd]));

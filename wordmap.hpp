@@ -9,7 +9,7 @@ public:
     std::unordered_map<std::string,int> wordToInt;
     std::unordered_map<int, std::string> intToWord;
     std::unordered_map<std::string, std::string> wordToPhon;
-    bool ok;
+    bool ok = true;
     int maxIndex = -1;
     std::vector<int>sequence;
 
