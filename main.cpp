@@ -113,7 +113,7 @@ std::string Rhyme(std::string word)
         int index = std::min(rhymePhon.length(), wordPhon.length());
         if (index > 5) {index = 5;}
 
-        while (index-1>0 && word.compare(rhymeWord) != 0)
+        while (index>0 && word.compare(rhymeWord) != 0)
         {
             if(index > maxI)
             {

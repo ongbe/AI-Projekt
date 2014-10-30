@@ -185,7 +185,7 @@ public:
             }
             else
             {
-                tempVal1 = weight[bestWrd]*tempVal2/w;
+                tempVal1 = 0;//weight[bestWrd]*tempVal2/w;
                 //std::cout << "else " << tempVal1 << " " << weight[j] << " " << tempVal2 << " " << w << std::endl;
             }
 
