@@ -25,6 +25,7 @@ private:
     std::unordered_set<std::string> trigrams;
     std::vector<int> allOk;
     WordMap oneMap;
+    double* weight;
 
 public:
     /**Contructor - generate matrices*/
@@ -34,6 +35,9 @@ public:
         M=m;
         std::cerr << "constructor called size: " << N << "x" << M << std::endl;
         oneMap = inMap;
+        weight = (double*)calloc(N,sizeof(double));
+        for(int i=0;i<N;++i)
+            weight[i] = 1.0;
     }
 
     std::string toString1(int one, int two)
@@ -92,7 +96,8 @@ public:
         std::vector<int> out;
 
         //If "superlong" word LastWord (just in case)
-        if (length - oneMap.syllables(oneMap.intToWord[lastWrd]) < 0)
+        //if (length - 1 < 0)
+        if (length - oneMap.syllables(oneMap.intToWord[lastWrd]) <= 0)
         {
             out.push_back(lastWrd);
             return out;
@@ -110,31 +115,36 @@ public:
             if (mapBigrams.find(temp1) != mapBigrams.end())
             {
                 //std::cout << "ok\t" << temp1 << "\t" << mapBigrams[temp1] << std::endl;
-                tempVal1 = mapBigrams[temp1];
+                tempVal1 = mapBigrams[temp1]* weight[i]/tempVal2;;
             }
             else
-                tempVal1 = 0;
-
-            tempVal1 /= tempVal2;
-            if((fabs(tempVal1 - maxFreq) < 1e-5) && tempVal1 - 1e-5 < 0)
+            {
+                tempVal1 = weight[lastWrd]*tempVal2/(double)oneMap.sequence.size();
+                //std::cout << tempVal1 << " " << weight[i] << " " << tempVal2 <<  " " << oneMap.sequence.size() << std::endl;
+            }
+            /*
+            if((fabs(tempVal1 - maxFreq) < 0.5))
             {
                 allOk.push_back(i);
             }
-            else if (tempVal1 > maxFreq)
+            else*/ if (tempVal1 > maxFreq)
             {
-                allOk.clear();
+                //allOk.clear();
                 bestWrd1 = i;
                 maxFreq = tempVal1;
             }
         }
-        if(!allOk.empty())
+        /*if(!allOk.empty())
         {
             srand (time(NULL));
             bestWrd1 = allOk[rand() % allOk.size()];
-        }
+            std::cout << "Allok best: "  << bestWrd1<< std::endl;
+        }*/
 
+        weight[bestWrd1]*=0.5;
         //Best word found! Generate the rest recursively.
         out = GenerateReq(lastWrd, bestWrd1, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
+        //out = GenerateReq(lastWrd, bestWrd1, length-1);
         out.push_back(lastWrd);
         int summa = 0;
         for(int i = 0; i < out.size(); i++)
@@ -149,7 +159,7 @@ public:
         std::vector<int> out;
 
         //Break condition - out of syllables
-        if (length - oneMap.syllables(oneMap.intToWord[bestWrd]) < 0)
+        if (length - oneMap.syllables(oneMap.intToWord[bestWrd]) <= 0)
         {
             out.push_back(bestWrd);
             return out;
@@ -161,6 +171,7 @@ public:
         //std::cout << lastWrd << " " << bestWrd << std::endl;
         std::string temp1 = toString1(lastWrd, bestWrd);
         tempVal2 = mapBigrams[temp1];
+        double w = count(oneMap.sequence.begin(), oneMap.sequence.end(), lastWrd);
         for(int j = 0; j < N; j++)
         {
             //Count occurrences
@@ -170,33 +181,36 @@ public:
             if ((trigrams.find(temp2) != trigrams.end()) && length - oneMap.syllables(oneMap.intToWord[j]))
             {
                 //std::cout << "YES\t" << j << "\t" << mapTrigrams[temp2] << std::endl;
-                tempVal1 = mapTrigrams[temp2];
+                tempVal1 = mapTrigrams[temp2]*weight[j]/tempVal2;
             }
             else
-                tempVal1 = 0;
+            {
+                tempVal1 = 0;//weight[j]*tempVal2/w;
+            }
 
             //Check if max
             //std::cout << tempVal1 << "\t" << tempVal2 << std::endl;
             //std::cout << tempVal1/tempVal2 << std::endl;
-
-            tempVal1 /= tempVal2;
+            /*
             if((fabs(tempVal1 - maxFreq) < 1e-5) && tempVal1 - 1e-5 < 0)
             {
                 allOk.push_back(j);
             }
-            else if (tempVal1 > maxFreq)
+            else*/ if (tempVal1 > maxFreq)
             {
-                allOk.clear();
+                //allOk.clear();
                 bestWrd2 = j;
                 maxFreq = tempVal1;
             }
         }
-        if(!allOk.empty())
+        /*if(!allOk.empty())
         {
             bestWrd2 = allOk[rand() % allOk.size()];
-        }
+        }*/
         //Best word found! Generate next word
+        weight[bestWrd]*=0.5;
         out = GenerateReq(bestWrd, bestWrd2, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
+        //out = GenerateReq(bestWrd, bestWrd2, length-1);
         out.push_back(bestWrd);
         return out;
     }
