@@ -159,9 +159,9 @@ public:
         std::vector<int> out;
 
         //Break condition - out of syllables
-        if (length - oneMap.syllables(oneMap.intToWord[bestWrd]) <= 0)
+        if (length - oneMap.syllables(oneMap.intToWord[bestWrd]) < 0)
         {
-            out.push_back(bestWrd);
+            //out.push_back(bestWrd);
             return out;
         }
 
@@ -178,7 +178,7 @@ public:
             //std::vector<int> temp2 = {lastWrd, bestWrd1, j};
             std::string temp2 = toString2(lastWrd,bestWrd,j);
             //int* tempTri =  temp2.data();
-            if ((trigrams.find(temp2) != trigrams.end()) && length - oneMap.syllables(oneMap.intToWord[j]))
+            if ((trigrams.find(temp2) != trigrams.end()) && fabs(length - oneMap.syllables(oneMap.intToWord[j]))>=0)
             {
                 //std::cout << "YES\t" << j << "\t" << mapTrigrams[temp2] << std::endl;
                 tempVal1 = mapTrigrams[temp2]*weight[j]/tempVal2;
