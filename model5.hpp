@@ -11,6 +11,7 @@
 #include <unordered_set>
 #include "wordmap.hpp"
 #include <sstream>
+#include <time.h>
 
 class model
 {
@@ -128,6 +129,7 @@ public:
         }
         if(!allOk.empty())
         {
+            srand (time(NULL));
             bestWrd1 = allOk[rand() % allOk.size()];
         }
 

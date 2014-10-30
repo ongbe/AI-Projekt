@@ -35,12 +35,6 @@ int main()
     model model(ourMap.maxIndex+1,ourMap.maxIndex+1, ourMap);
 
     std::cerr << "sequence.size(): "<< ourMap.sequence.size() << "  " << std::endl;
-    /*
-    std::cerr << "Baum-Welch" << std::endl;
-    model.BaumWelch(ourMap.sequence);
-    model.add();
-    std::cerr << "Baum-Welch + add done" << std::endl;
-    */
 
     //train hmm
     model.learn(ourMap.sequence);
@@ -67,21 +61,14 @@ int main()
             }
         }
 
-//        std::vector<int> test(rader, 1); //decide size of sentence
-//        for (int i=0; i<test.size(); i++)
-//        {
-//            test[i] = (100*rand())%ourMap.maxIndex;
-//        }
-//        std::vector<int> ny = model.Generate(test[j],10);
-
         int in = ourMap.wordToInt[input];
-
         std::vector<int> ny = model.Generate(in,10);
 
+        std::stringstream ss;
         for(int i=0;i<(int)ny.size();++i)
-            std::cout << ourMap.intToWord[ny[i]] << " ";
-        std::cout << std::endl;
-        //in = model.rhyme(wordToInt(ny[(int)ny.size()-1]));
+            ss << ourMap.intToWord[ny[i]] << " ";
+        std::cout << ss.str() << std::endl;
+
         //return 0; /** OBS!!!! TEMPORARY!*/
 
     }
