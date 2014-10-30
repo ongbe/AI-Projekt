@@ -120,6 +120,12 @@ public:
                 s++;
             found = newfound;
         }
+
+        if(input[input.length()-1]=='e' && !isVowel(input[input.length()-2]) && isVowel(input[input.length()-3]))
+        {
+            s--;
+        }
+
         return s;
     }
 
@@ -485,6 +491,14 @@ public:
 
 
         return ph;
+    }
+
+    bool isVowel(char a)
+    {
+        if(a=='a'||a=='e'||a=='i'||a=='o'||a=='u')
+            return true;
+        else
+            return false;
     }
 
 };
