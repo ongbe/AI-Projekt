@@ -40,7 +40,7 @@ public:
             start = 288;
             endLine = "End of The Project Gutenberg Etext of Shakespeare's Sonnets";
         }
-        /*else if(in == "FernandoAntonio.txt")
+        else if(in == "FernandoAntonio.txt")
         {
             start = 43;
             endLine = "***END OF THE PROJECT GUTENBERG EBOOK 35 SONNETS***";
@@ -54,7 +54,7 @@ public:
         {
             start = 84;
             endLine = "*** END OF THIS PROJECT GUTENBERG EBOOK SONNETS FROM THE PORTUGUESE ***";
-        }*/
+        }
         else
         {
             std::cerr << "No file called" << std::endl;

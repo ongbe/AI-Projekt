@@ -20,7 +20,7 @@ std::string Rhyme(std::string);
 int main()
 {
     /* Generate maps */
-    std::vector<std::string> v = {"Shakespeare.txt", "Petrarca.txt"};//, "FernandoAntonio.txt", "HelenHayWhitney.txt", "ElizabethBarrettBrowning.txt"};
+    std::vector<std::string> v = {"Shakespeare.txt", "Petrarca.txt", "FernandoAntonio.txt", "HelenHayWhitney.txt", "ElizabethBarrettBrowning.txt"};
 
     WordMap temp = WordMap(v);
     ourMap = temp;
