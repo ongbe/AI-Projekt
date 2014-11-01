@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <algorithm>
+#include <ctime>
 
 /** Globals */
 std::string input;
@@ -36,10 +37,11 @@ int main()
 
     std::cerr << "sequence.size(): "<< ourMap.sequence.size() << "  " << std::endl;
 
-    //train hmm
+    //train model
     model.learn(ourMap.sequence);
     bool newRhyme = true;
     std::string rhymeA, rhymeB;
+    srand (time(NULL)); //<--------------------------------------------Den är ny
     for(int j=0; j<14; ++j) //multiple sentences
     {
         if(j>=12)
@@ -81,14 +83,18 @@ std::string makeRhyme(bool newRhyme, std::string in)
 {
     if (newRhyme)
     {
-        //New rhyme
+        /*New rhyme
         input = -1000;
         while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
         {
             //New rhyme
             std::cout<< "Word: ";
             std::cin >> input;
-        }
+        }*/
+
+        int random = rand()%ourMap.maxIndex;   //detta är också nytt
+        //std::cout << random << std::endl;
+        input = ourMap.intToWord[random];
     }
     else
         input = Rhyme(in);
