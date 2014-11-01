@@ -94,6 +94,7 @@ public:
     {
         //std::cout << "1Generation: " << lastWrd << std::endl;
         std::vector<int> out;
+        std::vector<int> goodWords;
 
         //If "superlong" word LastWord (just in case)
         //if (length - 1 < 0)
@@ -127,19 +128,22 @@ public:
             {
                 allOk.push_back(i);
             }
-            else*/ if (tempVal1 > maxFreq)
+            else*/
+            if(tempVal1 == maxFreq)
             {
-                //allOk.clear();
-                bestWrd1 = i;
+                goodWords.push_back(i);
+            }
+            if (tempVal1 > maxFreq)
+            {
+                goodWords.clear();
+                goodWords.push_back(i);
+                //bestWrd1 = i;
                 maxFreq = tempVal1;
             }
         }
-        /*if(!allOk.empty())
-        {
-            srand (time(NULL));
-            bestWrd1 = allOk[rand() % allOk.size()];
-            std::cout << "Allok best: "  << bestWrd1<< std::endl;
-        }*/
+
+        //std::cout << "GoodWords.size(); " << goodWords.size() << std::endl;
+        bestWrd1 = goodWords[rand()%goodWords.size()];
 
         weight[bestWrd1]*=0.5;
         //Best word found! Generate the rest recursively.
@@ -170,7 +174,6 @@ public:
                 {
                     same = 0;
                 }
-
             }
         }
         if(c)
