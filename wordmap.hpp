@@ -107,6 +107,7 @@ public:
                 }
             }
             myfile.close();
+            //printout(sequence);
             std::cout << "Reading " << in << " done" << std::endl;
             return true;
         }
@@ -520,4 +521,18 @@ public:
             return false;
     }
 
+
+
+    void printout(std::vector<int> in)
+    {
+        std::ofstream myfile ("example.txt");
+        if (myfile.is_open())
+        {
+            for(int i=0;i<(int)in.size();++i)
+                myfile << intToWord[in[i]] << " ";
+            myfile.close();
+        }
+        else std::cout << "Unable to open file";
+        return;
+    }
 };
