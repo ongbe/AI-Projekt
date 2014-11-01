@@ -190,6 +190,7 @@ public:
     {
         //std::cout << "Generation: " << lastWrd << std::endl;
         std::vector<int> out;
+        std::vector<int> goodWords;
 
         //Break condition - out of syllables
         if (length - oneMap.syllables(oneMap.intToWord[bestWrd]) <= 0)
@@ -230,17 +231,23 @@ public:
             {
                 allOk.push_back(j);
             }
-            else*/ if (tempVal1 > maxFreq)
+            else*/
+            if (tempVal1 == maxFreq)
             {
-                //allOk.clear();
-                bestWrd2 = j;
+                goodWords.push_back(j);
+            }
+            if (tempVal1 > maxFreq)
+            {
+                goodWords.clear();
+                goodWords.push_back(j);
+                //bestWrd2 = j;
                 maxFreq = tempVal1;
             }
         }
-        /*if(!allOk.empty())
-        {
-            bestWrd2 = allOk[rand() % allOk.size()];
-        }*/
+
+        //std::cout << "GoodWords.size(); " << goodWords.size() << std::endl;
+        bestWrd2 = goodWords[rand()%goodWords.size()];
+
         //Best word found! Generate next word
         weight[bestWrd]*=0.5;
         out = GenerateReq(bestWrd, bestWrd2, length-oneMap.syllables(oneMap.intToWord[lastWrd]));

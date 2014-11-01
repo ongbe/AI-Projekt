@@ -142,9 +142,9 @@ std::string Rhyme(std::string word)
         }
     }
     //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
-    for (int i = 0; i < (int)rhymingWords.size(); i++)
-        std::cout << rhymingWords[i] << " ";
-    std::cout << "\n[" << rhymingWords.size() << "] ";
+    //for (int i = 0; i < (int)rhymingWords.size(); i++)
+        //std::cout << rhymingWords[i] << " ";
+    std::cout << "[" << rhymingWords.size() << "] ";
     return rhymingWords[rand()%rhymingWords.size()];
     return rhyme;
 }
