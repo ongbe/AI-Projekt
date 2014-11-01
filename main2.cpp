@@ -124,12 +124,14 @@ std::string Rhyme(std::string word)
 
         while (index>0 && word.compare(rhymeWord) != 0)
         {
-            if(index > maxI)
+            if(index >= maxI)
             {
                 //std::cout << "index > maxI: " << index << std::endl;
                 if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
                 {
                     //rhyme = rhymeWord;
+                    if (index > maxI)
+                        rhymingWords.clear();
                     rhymingWords.push_back(rhymeWord);
                     phon = rhymePhon;
                     maxI = index;
@@ -140,7 +142,9 @@ std::string Rhyme(std::string word)
         }
     }
     //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
-    std::cout << "[" << rhymingWords.size() << "] ";
+    for (int i = 0; i < (int)rhymingWords.size(); i++)
+        std::cout << rhymingWords[i] << " ";
+    std::cout << "\n[" << rhymingWords.size() << "] ";
     return rhymingWords[rand()%rhymingWords.size()];
     return rhyme;
 }
