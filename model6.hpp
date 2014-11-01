@@ -174,9 +174,9 @@ public:
             }
         }
         if(c)
-            std::cout << "it's a Copy ";
+            std::cout << "\tit's a Copy ";
         else
-            std::cout << "not a Copy  ";
+            std::cout << "\tnot a Copy  ";
         //
 
         int summa = 0;
