@@ -83,14 +83,15 @@ std::string makeRhyme(bool newRhyme, std::string in)
 {
     if (newRhyme)
     {
-        /*New rhyme
-        input = -1000;
-        while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
-        {
-            //New rhyme
-            std::cout<< "Word: ";
-            std::cin >> input;
-        }*/
+
+//        //New rhyme
+//        input = -1000;
+//        while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
+//        {
+//            //New rhyme
+//            std::cout<< "Word: ";
+//            std::cin >> input;
+//        }
 
         int random = rand()%ourMap.maxIndex;   //detta är också nytt
         //std::cout << random << std::endl;
@@ -132,7 +133,7 @@ std::string Rhyme(std::string word)
                     rhymingWords.push_back(rhymeWord);
                     phon = rhymePhon;
                     maxI = index;
-                    //index = -1; //break while loop
+                    index = -1; //break while loop
                 }
             }
             index--;
