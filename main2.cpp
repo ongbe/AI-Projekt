@@ -1,105 +1,142 @@
 #include <iostream>
-#include "HMM.hpp"
+#include "model6.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
 #include <sstream>
 #include <unordered_map>
 #include <cmath>
+#include <algorithm>
+#include <ctime>
 
-//std::unordered_set<std::string> wordset;
-std::unordered_map<std::string,int> wordToInt;
-std::unordered_map<int, std::string> intToWord;
-int maxIndex = -1;
+/** Globals */
+std::string input;
+WordMap ourMap;
 
-bool inVector(std::string in);
-int indexInVector(std::string in);
+/** Functions */
+std::string makeRhyme(bool, std::string);
+std::string Rhyme(std::string);
 
-
-bool inVector(std::string in)
-{
-    return wordToInt.find(in) != wordToInt.end();
-}
-
-int indexInVector(std::string in)
-{
-    return wordToInt[in];
-}
 
 int main()
 {
-    std::string line;
-    //std::ifstream myfile ("poems.txt");
-    std::ifstream myfile("ShakespeareSonnets.txt");
+    /* Generate maps */
+    std::vector<std::string> v = {"Shakespeare.txt", "Petrarca.txt", "FernandoAntonio.txt", "HelenHayWhitney.txt", "ElizabethBarrettBrowning.txt"};
 
-    std::vector<int>sequence;
+    WordMap temp = WordMap(v);
+    ourMap = temp;
 
-    if (myfile.is_open())
+    if(!ourMap.ok)
     {
-        /* Skip copyright notices etcetera */
-        for(int i = 0; i < 288; ++i) getline(myfile,line);
-        /* Actual used code*/
-        int nope = 0;
-        while ( getline (myfile,line) && nope <= 50)//&& line != "End of The Project Gutenberg Etext of Shakespeare's Sonnets")
+        std::cerr << "Program interrupted." << std::endl;
+        return 1;
+    }
+
+    /* Generate model */
+    model model(ourMap.maxIndex+1,ourMap.maxIndex+1, ourMap);
+
+    std::cerr << "sequence.size(): "<< ourMap.sequence.size() << "  " << std::endl;
+
+    //train model
+    model.learn(ourMap.sequence);
+    bool newRhyme = true;
+    std::string rhymeA, rhymeB;
+    srand (time(NULL)); //<--------------------------------------------Den är ny
+    for(int j=0; j<14; ++j) //multiple sentences
+    {
+        if(j>=12)
         {
-            nope++;
-            if (line.length() >= 10)
+            rhymeA = makeRhyme(newRhyme, rhymeA);
+            newRhyme = (newRhyme==false);
+            std::cout << "  ";
+        }
+        else
+        {
+            if(j%1 == 0)
             {
-                //std::cout << line << std::endl;
-                //spara ord + Baumwelch + add
-                //std::vector<int>sequence;
-                std::istringstream iss;
-                iss.str(line);
-                while (!iss.eof())
-                {
-                    std::string temp;
-                    iss >> temp;
-                    //std::cerr << temp << std::endl;
-                    if(!inVector(temp))
-                    {
-                        maxIndex++;
-                        wordToInt[temp] = maxIndex;
-                        intToWord[maxIndex] = temp;
-                        sequence.push_back(maxIndex);
-                    }
-                    else
-                    {
-                        sequence.push_back(indexInVector(temp));
-                    }
-                }
-                //sequences.push_back(sequence);
+                rhymeA = makeRhyme(newRhyme, rhymeA);
+                newRhyme = (newRhyme==false);
+            }
+            else
+            {
+                rhymeB = makeRhyme(!newRhyme, rhymeB);
             }
         }
-        myfile.close();
-    }
-    else std::cout << "Unable to open file";
-    std::cout << "Reading done" << std::endl;
-    HMM model(maxIndex+1,maxIndex+1);
-    model.reset();
 
-    std::cerr << "sequence.size(): "<< sequence.size() << "  " << std::endl;
+        int in = ourMap.wordToInt[input];
+        std::vector<int> ny = model.Generate(in,10);
 
-    std::cerr << "Baum-Welch" << std::endl;
-    //model.learn(sequence);
-    model.BaumWelch(sequence);
-    model.add();
-    std::cerr << "Baum-Welch + add done" << std::endl;
-
-    for(int j=0; j<8; j++) //multiple sentence
-    {
-//        std::vector<int> test(15, 1); //decide size of sentence
-//        for (int i=0; i<test.size(); i++)
-//        {
-//            test[i] = (100*rand())%maxIndex;
-//        }
-        //std::vector<int> ny = model.Viterbi(test);
-        std::vector<int> ny = model.Generate(j,10);//model.Viterbi(test);
-        //std::vector<int> ny = model.Viterbi(ny1);
-
+        std::stringstream ss;
         for(int i=0;i<(int)ny.size();++i)
-            std::cerr << intToWord[ny[i]] << " ";
-        std::cerr << "\n" << std::endl;
+            ss << ourMap.intToWord[ny[i]] << " ";
+        std::cout << ss.str() << std::endl;
+
+        //return 0; /** OBS!!!! TEMPORARY!*/
+
     }
 
+    //model.print();
 	return 0;
+}
+
+std::string makeRhyme(bool newRhyme, std::string in)
+{
+    if (newRhyme)
+    {
+        /*New rhyme
+        input = -1000;
+        while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
+        {
+            //New rhyme
+            std::cout<< "Word: ";
+            std::cin >> input;
+        }*/
+
+        int random = rand()%ourMap.maxIndex;   //detta är också nytt
+        //std::cout << random << std::endl;
+        input = ourMap.intToWord[random];
+    }
+    else
+        input = Rhyme(in);
+    return input;
+}
+
+std::string Rhyme(std::string word)
+{
+    int maxI = -1;
+    std::string wordPhon = ourMap.wordToPhon[word];
+    std::string rhymeWord;
+    std::string rhymePhon;
+    std::string rhyme = " ";
+    std::string phon = " ";
+    for(auto it = ourMap.wordToInt.begin(); it != ourMap.wordToInt.end(); ++it)
+    {
+        //std::cerr << wordPhon << " " << ourMap.phonetics(it->first) << std::endl;
+        rhymeWord = it->first;
+        //std::cerr << ourMap.wordToPhon[word] << " " << ourMap.wordToPhon[rhymeWord] << std::endl << std::endl;
+        rhymePhon = ourMap.wordToPhon[rhymeWord];
+
+        int index = std::min(rhymePhon.length(), wordPhon.length());
+        if (index > 5) {index = 5;}
+
+        while (index>0 && word.compare(rhymeWord) != 0)
+        {
+            if(index > maxI)
+            {
+                //std::cout << "index > maxI: " << index << std::endl;
+                if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
+                {
+                    rhyme = rhymeWord;
+                    phon = rhymePhon;
+                    maxI = index;
+                    index = -1; //break while loop
+                }
+            }
+            index--;
+        }
+    }
+    //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
+
+
+    return rhyme;
 }
