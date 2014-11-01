@@ -104,6 +104,8 @@ std::string makeRhyme(bool newRhyme, std::string in)
 std::string Rhyme(std::string word)
 {
     int maxI = -1;
+    std::vector<std::string>rhymingWords;
+
     std::string wordPhon = ourMap.wordToPhon[word];
     std::string rhymeWord;
     std::string rhymePhon;
@@ -126,17 +128,18 @@ std::string Rhyme(std::string word)
                 //std::cout << "index > maxI: " << index << std::endl;
                 if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
                 {
-                    rhyme = rhymeWord;
+                    //rhyme = rhymeWord;
+                    rhymingWords.push_back(rhymeWord);
                     phon = rhymePhon;
                     maxI = index;
-                    index = -1; //break while loop
+                    //index = -1; //break while loop
                 }
             }
             index--;
         }
     }
     //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
-
-
+    std::cout << "[" << rhymingWords.size() << "] ";
+    return rhymingWords[rand()%rhymingWords.size()];
     return rhyme;
 }
