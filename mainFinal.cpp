@@ -23,6 +23,13 @@ int main()
     bool debug = false;
     bool randomWords = true;
 
+    std::string choice;
+    std::cout << "Do you want to write the words yourself? ";
+    std::getline(std::cin,choice);
+    std::transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
+    if(choice == "yes")
+        randomWords = false;
+
     /* Generate maps */
     std::vector<std::string> v = {"Shakespeare.txt", "Petrarca.txt", "FernandoAntonio.txt", "HelenHayWhitney.txt", "ElizabethBarrettBrowning.txt"};
 
@@ -93,7 +100,7 @@ std::string makeRhyme(bool newRhyme, std::string in)
             {
                 //New rhyme
                 std::cout<< "Word: ";
-                std::cin >> input;
+                std::getline(std::cin,input);
             }
         }
         else //random words
