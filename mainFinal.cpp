@@ -1,5 +1,5 @@
 #include <iostream>
-#include "model6.hpp"
+#include "modelFinal.hpp"
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -23,7 +23,8 @@ int main()
     /* Generate maps */
     std::vector<std::string> v = {"Shakespeare.txt", "Petrarca.txt", "FernandoAntonio.txt", "HelenHayWhitney.txt", "ElizabethBarrettBrowning.txt"};
 
-    WordMap temp = WordMap(v);
+    //WordMap(text, debug)
+    WordMap temp = WordMap(v,true);  //
     ourMap = temp;
 
     if(!ourMap.ok)
@@ -32,16 +33,19 @@ int main()
         return 1;
     }
 
-    /* Generate model */
-    model model(ourMap.maxIndex+1,ourMap.maxIndex+1, ourMap);
+    /* create model */
+    model model(ourMap);
 
-    std::cerr << "sequence.size(): "<< ourMap.sequence.size() << "  " << std::endl;
-
-    //train model
+    std::cerr << "Number of word in total: "<< ourMap.sequence.size() << "  " << std::endl;
     model.learn(ourMap.sequence);
     bool newRhyme = true;
     std::string rhymeA, rhymeB;
-    srand (time(NULL)); //<--------------------------------------------Den är ny
+    srand (time(NULL));
+
+    int mod = 2;
+    if(ourMap.debug)
+        mod = 1; //changed the order of lines, to make it easier to see if the lines rhyme
+
     for(int j=0; j<14; ++j) //multiple sentences
     {
         if(j>=12)
@@ -52,7 +56,7 @@ int main()
         }
         else
         {
-            if(j%1 == 0)
+            if(j%mod == 0)
             {
                 rhymeA = makeRhyme(newRhyme, rhymeA);
                 newRhyme = (newRhyme==false);
@@ -70,12 +74,7 @@ int main()
         for(int i=0;i<(int)ny.size();++i)
             ss << ourMap.intToWord[ny[i]] << " ";
         std::cout << ss.str() << std::endl;
-
-        //return 0; /** OBS!!!! TEMPORARY!*/
-
     }
-
-    //model.print();
 	return 0;
 }
 
@@ -84,18 +83,22 @@ std::string makeRhyme(bool newRhyme, std::string in)
     if (newRhyme)
     {
 
-//        //New rhyme
-//        input = -1000;
-//        while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
-//        {
-//            //New rhyme
-//            std::cout<< "Word: ";
-//            std::cin >> input;
-//        }
-
-        int random = rand()%ourMap.maxIndex;   //detta är också nytt
-        //std::cout << random << std::endl;
-        input = ourMap.intToWord[random];
+        //New rhyme
+        if(!ourMap.debug) //user input
+        {
+            input = -1000;
+            while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
+            {
+                //New rhyme
+                std::cout<< "Word: ";
+                std::cin >> input;
+            }
+        }
+        else //random words
+        {
+            int random = rand()%ourMap.maxIndex;
+            input = ourMap.intToWord[random];
+        }
     }
     else
         input = Rhyme(in);

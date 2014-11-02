@@ -9,37 +9,35 @@
 #include <fstream>
 #include <unordered_map>
 #include <unordered_set>
-#include "wordmap.hpp"
+#include "wordmapFinal.hpp"
 #include <sstream>
 #include <time.h>
 
 class model
 {
 private:
-    int N;// = 9; States
-    int M;// = 9; Observations
-    //double** A;
-    //int* p; //number of times each word occurs
-    std::unordered_map<std::string, double> mapBigrams;
-    std::unordered_map<std::string, double> mapTrigrams;
-    std::unordered_set<std::string> trigrams;
-    std::vector<int> allOk;
+    int N;
+    std::unordered_map<std::string, double> mapBigrams; //key=the bigram value = number of times it occurred
+    std::unordered_map<std::string, double> mapTrigrams; //key=the trigram value = number of times it occurred
+    std::unordered_set<std::string> trigrams; //stored trigrams
+
     WordMap oneMap;
-    double* weight;
+    double* weight; //each word has a weight, the weight is reduced if the word has been used, this
+                    // prevents the program from writing the same word all the time.
 
 public:
-    /**Contructor - generate matrices*/
-    model(int n, int m, WordMap inMap)
+    /**Contructor */
+    model(WordMap inMap)
     {
-        N=n;
-        M=m;
-        std::cerr << "constructor called size: " << N << "x" << M << std::endl;
+        N=inMap.maxIndex+1;
+        std::cerr << "Number of unique words: " << N << std::endl;
         oneMap = inMap;
         weight = (double*)calloc(N,sizeof(double));
         for(int i=0;i<N;++i)
             weight[i] = 1.0;
     }
 
+    //creates a hashable string from two integers
     std::string toString1(int one, int two)
     {
         std::stringstream ss;
@@ -52,6 +50,7 @@ public:
         return str2;
     }
 
+    //creates a hashable string from three integers
     std::string toString2(int one, int two, int three)
     {
         std::stringstream ss;
@@ -66,25 +65,19 @@ public:
         return str2;
     }
 
-    /**uses the sequence "input" to train the hmm-model
-    * input = the emission sequence
+    /**uses the sequence "in" to generate bigrams and trigrams.
+    * in = the emission sequence
     */
     void learn(std::vector<int> in)
     {
         for (int i = in.size()-1; i > 1 ; i--)
         {
-            //std::vector<int> temp1 = {in[i],in[i-1]}, temp2 = {in[i],in[i-1],in[i-2]};
-            //std::string temp1 = ""; temp1.append(in[i]); temp1.append(" "); temp1.append(in[i-1]);
-            //std::string temp1 = ""; temp1.append(in[i]); temp1.append(" "); temp1.append(in[i-1]);
-
             std::string temp1 = toString1(in[i],in[i-1]);
             std::string temp2 = toString2(in[i],in[i-1], in[i-2]);
 
-            //std::string temp2 = ""+in[i]+" "+in[i-1]+" "+in[i-2];
-            //int* tempBi =  temp1.data();
-            mapBigrams[temp1]++; //If not previously existing (new bigram), automatically creates a node with value 0+1=1. Else, add 1 to value (count).
-            //int* tempTri = temp2.data();
+            mapBigrams[temp1]++;
             mapTrigrams[temp2]++;
+
             trigrams.insert(temp2);
         }
     }
@@ -96,23 +89,18 @@ public:
         std::vector<int> out;
         std::vector<int> goodWords;
 
-        //If "superlong" word LastWord (just in case)
-        //if (length - 1 < 0)
         if (length - oneMap.syllables(oneMap.intToWord[lastWrd]) <= 0)
         {
             out.push_back(lastWrd);
             return out;
         }
 
-        //Consider
         int bestWrd1;
         double maxFreq = 0, tempVal1, tempVal2;
         tempVal2 = count(oneMap.sequence.begin(), oneMap.sequence.end(), lastWrd);
         for(int i = 0; i < mapBigrams.size(); i++)
         {
-            //std::vector<int> temp1 = {lastWrd,i};
             std::string temp1 = toString1(lastWrd,i);
-            //int* tempBi =  temp1.data();
             if (mapBigrams.find(temp1) != mapBigrams.end())
             {
                 tempVal1 = mapBigrams[temp1]* weight[i]/tempVal2;;
@@ -126,27 +114,26 @@ public:
             {
                 goodWords.push_back(i);
             }
+
             if (tempVal1 > maxFreq)
             {
                 goodWords.clear();
                 goodWords.push_back(i);
-                //bestWrd1 = i;
                 maxFreq = tempVal1;
             }
         }
 
-        //std::cout << "GoodWords.size(); " << goodWords.size() << std::endl;
-        bestWrd1 = goodWords[rand()%goodWords.size()];
+        bestWrd1 = goodWords[rand()%goodWords.size()]; //chooses a word from a list with words, all words in
+                                                       //this list has the same probability.
+        weight[bestWrd1]*=0.5; //reduces the weight of the word.
 
-        weight[bestWrd1]*=0.5;
-        //Best word found! Generate the rest recursively.
+        //Generate the rest recursively.
         out = GenerateReq(lastWrd, bestWrd1, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
-        //out = GenerateReq(lastWrd, bestWrd1, length-1);
         out.push_back(lastWrd);
 
         int same = 0;
         bool c = false;
-        //kolla om en rad existerar
+        //checks if a line exits in the corpus
         for(int i=0;i<oneMap.sequence.size();++i)
         {
             if(oneMap.sequence[i] == out[0])
@@ -173,8 +160,8 @@ public:
             std::cout << "\tit's a Copy ";
         else
             std::cout << "\tnot a Copy  ";
-        //
 
+        //counts the number of syllables in the line
         int summa = 0;
         for(int i = 0; i < out.size(); i++)
             summa += oneMap.syllables(oneMap.intToWord[out[i]]);
@@ -182,9 +169,9 @@ public:
         return out;
     }
 
+    //generates the line recursively.
     std::vector<int> GenerateReq(int lastWrd, int bestWrd, int length)
     {
-        //std::cout << "Generation: " << lastWrd << std::endl;
         std::vector<int> out;
         std::vector<int> goodWords;
 
@@ -195,43 +182,29 @@ public:
             return out;
         }
 
-        //Consider
         int bestWrd2 = 0;
         double maxFreq = 0, tempVal1, tempVal2;
-        //std::cout << lastWrd << " " << bestWrd << std::endl;
         std::string temp1 = toString1(lastWrd, bestWrd);
         tempVal2 = mapBigrams[temp1];
         double w = count(oneMap.sequence.begin(), oneMap.sequence.end(), lastWrd);
         for(int j = 0; j < N; j++)
         {
-            //Count occurrences
-            //std::vector<int> temp2 = {lastWrd, bestWrd1, j};
             std::string temp2 = toString2(lastWrd,bestWrd,j);
-            //int* tempTri =  temp2.data();
             if ((trigrams.find(temp2) != trigrams.end()) && length - oneMap.syllables(oneMap.intToWord[j]))
             {
-                //std::cout << "YES\t" << j << "\t" << mapTrigrams[temp2] << std::endl;
                 tempVal1 = mapTrigrams[temp2]*weight[j]/tempVal2;
             }
             else
             {
-                tempVal1 = 0;//weight[bestWrd]*tempVal2/w;
-                //std::cout << "else " << tempVal1 << " " << weight[j] << " " << tempVal2 << " " << w << std::endl;
+                tempVal1 = 0;
+                //tempVal1 = weight[bestWrd]*tempVal2/w; -add one smoothing
             }
 
-            //Check if max
-            //std::cout << tempVal1 << "\t" << tempVal2 << std::endl;
-            //std::cout << tempVal1/tempVal2 << std::endl;
-            /*
-            if((fabs(tempVal1 - maxFreq) < 1e-5) && tempVal1 - 1e-5 < 0)
-            {
-                allOk.push_back(j);
-            }
-            else*/
             if (tempVal1 == maxFreq)
             {
                 goodWords.push_back(j);
             }
+
             if (tempVal1 > maxFreq)
             {
                 goodWords.clear();
@@ -241,13 +214,9 @@ public:
             }
         }
 
-        //std::cout << "GoodWords.size(); " << goodWords.size() << std::endl;
         bestWrd2 = goodWords[rand()%goodWords.size()];
-
-        //Best word found! Generate next word
         weight[bestWrd]*=0.5;
         out = GenerateReq(bestWrd, bestWrd2, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
-        //out = GenerateReq(bestWrd, bestWrd2, length-1);
         out.push_back(bestWrd);
         return out;
     }
