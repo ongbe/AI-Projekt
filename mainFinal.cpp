@@ -23,8 +23,11 @@ int main()
     bool debug = false;
     bool randomWords = true;
 
+    if(debug)
+        std::cout << "Debug mode\n[n], n=number of rhyming words\n(n), n=number of syllables in the line" << std::endl;
+
     std::string choice;
-    std::cout << "Do you want to write the words yourself? ";
+    std::cout << "This is a sonnet generator\nDo you want to write the rhyme words yourself? ";
     std::getline(std::cin,choice);
     std::transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
     if(choice == "yes")
