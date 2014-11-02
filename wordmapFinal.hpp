@@ -13,10 +13,11 @@ public:
     int maxIndex = -1;
     std::vector<int>sequence;
     bool debug;
+    bool rWords;
 
     WordMap(){}
 
-    WordMap(std::vector<std::string> in, bool d)
+    WordMap(std::vector<std::string> in, bool d, bool w)
     {
         for (auto i : in)
         {
@@ -24,6 +25,7 @@ public:
             ok = (ok && temp);
         }
         debug = d;
+        rWords = w;
     }
 
     bool readFile(std::string in)

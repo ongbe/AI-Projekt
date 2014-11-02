@@ -20,11 +20,14 @@ std::string Rhyme(std::string);
 
 int main()
 {
+    bool debug = false;
+    bool randomWords = true;
+
     /* Generate maps */
     std::vector<std::string> v = {"Shakespeare.txt", "Petrarca.txt", "FernandoAntonio.txt", "HelenHayWhitney.txt", "ElizabethBarrettBrowning.txt"};
 
-    //WordMap(text, debug)
-    WordMap temp = WordMap(v,true);  //
+    //WordMap(text, debug, random words)
+    WordMap temp = WordMap(v,debug, randomWords);
     ourMap = temp;
 
     if(!ourMap.ok)
@@ -36,7 +39,7 @@ int main()
     /* create model */
     model model(ourMap);
 
-    std::cerr << "Number of word in total: "<< ourMap.sequence.size() << "  " << std::endl;
+    std::cerr << "Number of word in total: "<< ourMap.sequence.size() << "\n  " << std::endl;
     model.learn(ourMap.sequence);
     bool newRhyme = true;
     std::string rhymeA, rhymeB;
@@ -82,9 +85,8 @@ std::string makeRhyme(bool newRhyme, std::string in)
 {
     if (newRhyme)
     {
-
         //New rhyme
-        if(!ourMap.debug) //user input
+        if(!ourMap.rWords) //user input
         {
             input = -1000;
             while(ourMap.wordToInt.find(input) == ourMap.wordToInt.end())
@@ -105,6 +107,7 @@ std::string makeRhyme(bool newRhyme, std::string in)
     return input;
 }
 
+/**returns a rhyming word to "word"*/
 std::string Rhyme(std::string word)
 {
     int maxI = -1;
@@ -117,9 +120,7 @@ std::string Rhyme(std::string word)
     std::string phon = " ";
     for(auto it = ourMap.wordToInt.begin(); it != ourMap.wordToInt.end(); ++it)
     {
-        //std::cerr << wordPhon << " " << ourMap.phonetics(it->first) << std::endl;
         rhymeWord = it->first;
-        //std::cerr << ourMap.wordToPhon[word] << " " << ourMap.wordToPhon[rhymeWord] << std::endl << std::endl;
         rhymePhon = ourMap.wordToPhon[rhymeWord];
 
         int index = std::min(rhymePhon.length(), wordPhon.length());
@@ -129,8 +130,6 @@ std::string Rhyme(std::string word)
         {
             if(index >= maxI && (rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size())))
             {
-                //std::cout << "index > maxI: " << index << std::endl;
-                //rhyme = rhymeWord;
                 if (index > maxI)
                     rhymingWords.clear();
                 rhymingWords.push_back(rhymeWord);
@@ -141,10 +140,7 @@ std::string Rhyme(std::string word)
             index--;
         }
     }
-    //std::cout << std::endl << "Rhyme: " << word << "  (phonetic: " << wordPhon << ") --> " << rhyme << "  (phonetic: " << phon << ")" << std::endl << std::endl;
-    //for (int i = 0; i < (int)rhymingWords.size(); i++)
-        //std::cout << rhymingWords[i] << " ";
-    std::cout << "[" << rhymingWords.size() << "] ";
+    if(ourMap.debug)
+        std::cout << "[" << rhymingWords.size() << "] ";
     return rhymingWords[rand()%rhymingWords.size()];
-    return rhyme;
 }

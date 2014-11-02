@@ -131,41 +131,45 @@ public:
         out = GenerateReq(lastWrd, bestWrd1, length-oneMap.syllables(oneMap.intToWord[lastWrd]));
         out.push_back(lastWrd);
 
-        int same = 0;
-        bool c = false;
-        //checks if a line exits in the corpus
-        for(int i=0;i<oneMap.sequence.size();++i)
+        if(oneMap.debug)
         {
-            if(oneMap.sequence[i] == out[0])
+            int same = 0;
+            bool c = false;
+            //checks if a line exits in the corpus
+            for(int i=0;i<oneMap.sequence.size();++i)
             {
-                same+=1;
-                for(int j=1;j<out.size();++j)
+                if(oneMap.sequence[i] == out[0])
                 {
-                    if(oneMap.sequence[i+j] == out[j])
+                    same+=1;
+                    for(int j=1;j<out.size();++j)
                     {
-                        same++;
+                        if(oneMap.sequence[i+j] == out[j])
+                        {
+                            same++;
+                        }
+                    }
+                    if(same == out.size()-1)
+                    {
+                        c=true;
+                    }
+                    else
+                    {
+                        same = 0;
                     }
                 }
-                if(same == out.size()-1)
-                {
-                    c=true;
-                }
-                else
-                {
-                    same = 0;
-                }
             }
-        }
-        if(c)
-            std::cout << "\tit's a Copy ";
-        else
-            std::cout << "\tnot a Copy  ";
+            if(c)
+                std::cout << "\tit's a Copy ";
+            else
+                std::cout << "\tnot a Copy  ";
 
-        //counts the number of syllables in the line
-        int summa = 0;
-        for(int i = 0; i < out.size(); i++)
-            summa += oneMap.syllables(oneMap.intToWord[out[i]]);
-        std::cout << "(" << summa << ")-";
+            //counts the number of syllables in the line
+            int summa = 0;
+            for(int i = 0; i < out.size(); i++)
+                summa += oneMap.syllables(oneMap.intToWord[out[i]]);
+            std::cout << "(" << summa << ")-";
+        }
+
         return out;
     }
 
@@ -209,7 +213,6 @@ public:
             {
                 goodWords.clear();
                 goodWords.push_back(j);
-                //bestWrd2 = j;
                 maxFreq = tempVal1;
             }
         }
