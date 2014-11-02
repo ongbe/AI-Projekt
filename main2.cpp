@@ -124,19 +124,16 @@ std::string Rhyme(std::string word)
 
         while (index>0 && word.compare(rhymeWord) != 0)
         {
-            if(index >= maxI)
+            if(index >= maxI && (rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size())))
             {
                 //std::cout << "index > maxI: " << index << std::endl;
-                if(rhymePhon.substr(rhymePhon.size()-index,rhymePhon.size()) == wordPhon.substr(wordPhon.size()-index,wordPhon.size()))
-                {
-                    //rhyme = rhymeWord;
-                    if (index > maxI)
-                        rhymingWords.clear();
-                    rhymingWords.push_back(rhymeWord);
-                    phon = rhymePhon;
-                    maxI = index;
-                    index = -1; //break while loop
-                }
+                //rhyme = rhymeWord;
+                if (index > maxI)
+                    rhymingWords.clear();
+                rhymingWords.push_back(rhymeWord);
+                phon = rhymePhon;
+                maxI = index;
+                index = -1; //break while loop
             }
             index--;
         }
